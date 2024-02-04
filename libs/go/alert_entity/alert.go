@@ -21,7 +21,7 @@ func DefaultAlert() *AlertEntity {
 		occurrenceId: "",
 		timestamp:    time.Now().UnixNano(),
 		description:  "random alert",
-		state:        "firing",
+		state:        getRandomState(),
 		alertId:      strconv.FormatInt(getRandomLetter(), 10),
 	}
 }
@@ -50,4 +50,14 @@ func getRandomLetter() int64 {
 		return 0
 	}
 	return number.Int64() + 1 // Add 1 to get 1-10 range
+}
+
+func getRandomState() string {
+	state := []string{"firing", "resolved"}
+	biggestNumber := big.NewInt(int64(len(state)))
+	num, err := rand.Int(rand.Reader, biggestNumber)
+	if err != nil {
+		log.Printf("error getting random nuber: %v", err)
+	}
+	return state[num.Int64()]
 }
