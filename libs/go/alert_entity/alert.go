@@ -1,21 +1,53 @@
 package alert_entity
 
 import (
+	"crypto/rand"
+	"log"
+	"math/big"
+	"strconv"
 	"time"
 )
 
 type AlertEntity struct {
-	fingerprint string
-	timestamp   int64
-	description string
-	state       string
+	occurrenceId string
+	timestamp    int64
+	description  string
+	state        string
+	alertId      string
 }
 
 func DefaultAlert() *AlertEntity {
 	return &AlertEntity{
-		fingerprint: "",
-		timestamp:   time.Now().UnixNano(),
-		description: "random alert",
-		state:       "firing",
+		occurrenceId: "",
+		timestamp:    time.Now().UnixNano(),
+		description:  "random alert",
+		state:        "firing",
+		alertId:      strconv.FormatInt(getRandomLetter(), 10),
 	}
+}
+
+func (a *AlertEntity) GetOccurrenceId() string {
+	return a.occurrenceId
+}
+func (a *AlertEntity) GetTimestamp() int64 {
+	return a.timestamp
+}
+func (a *AlertEntity) GetDescription() string {
+	return a.description
+}
+func (a *AlertEntity) GetState() string {
+	return a.state
+}
+func (a *AlertEntity) GetAlertId() string {
+	return a.alertId
+}
+
+func getRandomLetter() int64 {
+	biggestNumber := big.NewInt(10) // Convert biggestNumber value to big.Int
+	number, err := rand.Int(rand.Reader, biggestNumber)
+	if err != nil {
+		log.Printf("error getting random number: %v", err)
+		return 0
+	}
+	return number.Int64() + 1 // Add 1 to get 1-10 range
 }
