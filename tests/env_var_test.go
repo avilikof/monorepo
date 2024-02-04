@@ -1,109 +1,72 @@
 package tests
 
 import (
-	"errors"
-	_ "os"
+	"log"
+	"os"
 	"testing"
 
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-// MockViper for controlled testing
-type MockViper struct {
-	mock.Mock
+// TestNewEnvVarHandler tests the initialization of the EnvironmentVarHandler.
+func TestNewEnvVarHandler(t *testing.T) {
+	_, err := env_var.NewEnvVarHandler()
+	assert.NoError(t, err)
 }
 
-func (m *MockViper) SetEnvPrefix(prefix string) {
-	m.Called(prefix)
+// TestLoadDotEnv tests loading environment variables from a .env file.
+func TestLoadDotEnv(t *testing.T) {
+	// Setup: Create a temporary .env file.
+	file, err := os.Create("./.env")
+	if err != nil {
+		t.Fatalf("Unable to create temporary .env file: %v", err)
+	}
+	defer os.Remove(file.Name()) // Clean up
+
+	_, err = file.WriteString("TEST_VAR=hello\n")
+	if err != nil {
+		t.Fatalf("Unable to write to temporary .env file: %v", err)
+	}
+	file.Close()
+
+	handler, err := env_var.NewEnvVarHandler()
+	assert.NoError(t, err)
+
+	err = handler.LoadDotEnv(file.Name())
+	assert.NoError(t, err)
+
+	// Test retrieving the variable set in the .env file
+	val, err := handler.Get("TEST_VAR")
+	assert.NoError(t, err)
+	assert.Equal(t, "hello", val)
 }
 
-func (m *MockViper) AutomaticEnv() {
-	m.Called()
-}
+// TestGet tests retrieving environment variables through the handler.
+func TestGet(t *testing.T) {
+	const testKey = "SOME_VAR"
+	const testValue = "some_value"
 
-func (m *MockViper) AddConfigPath(path string) {
-	m.Called(path)
-}
+	// Setup: Set an environment variable
+	err := os.Setenv(testKey, testValue)
+	if err != nil {
+		log.Println(err)
+	}
+	defer os.Unsetenv(testKey) // Clean up
 
-func (m *MockViper) SetConfigFile(filename string) {
-	m.Called(filename)
-}
+	handler, err := env_var.NewEnvVarHandler()
+	assert.NoError(t, err)
 
-func (m *MockViper) ReadInConfig() error {
-	return m.Called().Error(0)
-}
+	// Test retrieving the variable
+	val, err := handler.Get(testKey)
+	assert.NoError(t, err)
+	assert.Equal(t, testValue, val)
 
-func (m *MockViper) GetString(key string) string {
-	args := m.Called(key)
-	return args.String(0)
-}
+	// Test retrieving a non-existent variable
+	_, err = handler.Get("NON_EXISTENT_VAR")
+	assert.Error(t, err)
 
-// Test suite
-func TestEnvironmentVarHandler(t *testing.T) {
-	var mockViper = new(MockViper) // Use a mock Viper for testing
-
-	// Test NewEnvVarHandler
-	t.Run("NewEnvVarHandler - success", func(t *testing.T) {
-		prefix := "TEST_PREFIX"
-		handler, err := env_var.NewEnvVarHandler(&prefix)
-		assert.NoError(t, err)
-		assert.NotNil(t, handler)
-	})
-
-	t.Run("NewEnvVarHandler - error handling", func(t *testing.T) {
-		var errPrefix *string // Empty prefix
-		handler, err := env_var.NewEnvVarHandler(errPrefix)
-		assert.Error(t, err)
-		assert.Nil(t, handler)
-	})
-
-	// Test loadSystemVariables (using mock Viper)
-	t.Run("loadSystemVariables - sets prefix", func(t *testing.T) {
-		prefix := "TEST_PREFIX"
-		mockViper.AssertCalled(t, "SetEnvPrefix", prefix)
-	})
-
-	// Test LoadDotEnv (using mock Viper)
-	t.Run("LoadDotEnv - success", func(t *testing.T) {
-		path := "test/path"
-		prefix := "TEST_PREFIX"
-		handler, _ := env_var.NewEnvVarHandler(&prefix)
-		mockViper.On("ReadInConfig").Return(nil)
-		assert.NoError(t, handler.LoadDotEnv(&path, &prefix))
-		mockViper.AssertCalled(t, "AddConfigPath", path)
-		mockViper.AssertCalled(t, "SetConfigFile", ".env")
-		mockViper.AssertCalled(t, "ReadInConfig")
-	})
-
-	t.Run("LoadDotEnv - error handling", func(t *testing.T) {
-		path := "invalid/path"
-		prefix := "TEST_PREFIX"
-		handler, _ := env_var.NewEnvVarHandler(&prefix)
-		mockViper.On("ReadInConfig").Return(errors.New("error reading config"))
-		assert.Error(t, handler.LoadDotEnv(&path, &prefix))
-		mockViper.AssertCalled(t, "ReadInConfig")
-	})
-
-	// Test Get (using mock Viper)
-	t.Run("Get - valid key", func(t *testing.T) {
-		key := "TEST_KEY"
-		value := "test_value"
-		mockViper.On("GetString", key).Return(value)
-		prefix := ""
-		handler, _ := env_var.NewEnvVarHandler(&prefix)
-		result, err := handler.Get(&key)
-		assert.NoError(t, err)
-		assert.Equal(t, value, result)
-	})
-
-	t.Run("Get - empty key", func(t *testing.T) {
-		var emptyKey *string
-		prefix := ""
-		handler, _ := env_var.NewEnvVarHandler(&prefix)
-		result, err := handler.Get(emptyKey)
-		assert.Error(t, err)
-		assert.Empty(t, result)
-	})
+	// Test retrieving with an empty key
+	_, err = handler.Get("")
+	assert.Error(t, err)
 }
