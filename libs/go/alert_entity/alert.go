@@ -16,8 +16,11 @@ type AlertEntity struct {
 	alertId      string
 }
 
-func DefaultAlert() *AlertEntity {
-	return &AlertEntity{
+func NewAlertEntity() AlertEntity {
+	return AlertEntity{}
+}
+func RandomAlert() AlertEntity {
+	return AlertEntity{
 		occurrenceId: "",
 		timestamp:    time.Now().UnixNano(),
 		description:  "random alert",
