@@ -2,11 +2,14 @@ module github.com/avilikof/monorepo/apps/go/productivity_tools/alert_generator
 
 go 1.21.6
 
-require github.com/avilikof/monorepo/lib/go/alert_entity v0.1.0
-
-require github.com/avilikof/monorepo/lib/go/env_var v0.1.0
+require (
+	github.com/avilikof/monorepo/lib/go/alert_entity v0.1.0
+	github.com/avilikof/monorepo/lib/go/env_var v0.1.0
+	github.com/avilikof/monorepo/lib/go/kafka_driver v0.1.0
+)
 
 require (
+	github.com/confluentinc/confluent-kafka-go/v2 v2.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -32,3 +35,5 @@ require (
 replace github.com/avilikof/monorepo/lib/go/alert_entity => ../../../../libs/go/alert_entity
 
 replace github.com/avilikof/monorepo/lib/go/env_var => ../../../../libs/go/env_var
+
+replace github.com/avilikof/monorepo/lib/go/kafka_driver => ../../../../libs/go/kafka_driver
