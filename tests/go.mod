@@ -1,4 +1,4 @@
-module tests
+module  github.com/avilikof/monorepo/tests
 
 go 1.21
 
