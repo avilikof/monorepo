@@ -27,7 +27,7 @@ func (kh *KafkaHandler) Subscribe(envVars *env_var.EnvironmentVarHandler) error 
 
 	groupId, offset, err := getConsumerEnvVars(envVars)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	cons, err := createKafkaConsumer(groupId, offset, configMap)
