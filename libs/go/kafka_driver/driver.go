@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"time"
 )
 
 type KafkaHandler struct {
@@ -20,6 +21,8 @@ func (kh *KafkaHandler) Subscribe(envVars *env_var.EnvironmentVarHandler) error 
 		return nil
 	}
 
+	var err error
+
 	configMap, err := setConfigMap(envVars)
 	if err != nil {
 		return err
@@ -34,13 +37,21 @@ func (kh *KafkaHandler) Subscribe(envVars *env_var.EnvironmentVarHandler) error 
 	if err != nil {
 		return err
 	}
+	topic, err := envVars.Get("KAFKA_TOPIC")
+	if err != nil {
+		return err
+	}
+	err = cons.Subscribe(topic, nil)
+	if err != nil {
+		return err
+	}
 	return kh.setConsumer(cons)
 }
 func (kh *KafkaHandler) SubscriptionIsActive() bool {
 	if kh.consumer == nil {
 		return false
 	}
-	return kh.consumer.IsClosed()
+	return !kh.consumer.IsClosed()
 }
 
 func (kh *KafkaHandler) setConsumer(cons *kafka.Consumer) error {
@@ -60,6 +71,14 @@ func getConsumerEnvVars(envVars *env_var.EnvironmentVarHandler) (string, string,
 		return "", "", err
 	}
 	return groupId, offset, nil
+}
+
+func (kh *KafkaHandler) Get() (kafka.Message, error) {
+	message, err := kh.consumer.ReadMessage(120 * time.Second)
+	if err != nil {
+		return kafka.Message{}, err
+	}
+	return *message, nil
 }
 
 func setConfigMap(envVars *env_var.EnvironmentVarHandler) (*kafka.ConfigMap, error) {
