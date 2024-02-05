@@ -39,7 +39,8 @@ func checkKafka(envVars *env_var.EnvironmentVarHandler) {
 	for i := 0; true; i++ {
 		msg, err := client.Get()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
+			break
 		}
 		if i%1000 == 0 {
 			log.Println(string(msg.Value), i)
