@@ -1,10 +1,13 @@
-module  github.com/avilikof/monorepo/tests
+module github.com/avilikof/monorepo/tests
 
-go 1.21
+go 1.21.6
 
 replace github.com/avilikof/monorepo/lib/go/env_var => ../libs/go/env_var
 
+replace github.com/avilikof/monorepo/lib/go/alert_entity => ../libs/go/alert_entity
+
 require (
+	github.com/avilikof/monorepo/lib/go/alert_entity v0.0.0-00010101000000-000000000000
 	github.com/avilikof/monorepo/lib/go/env_var v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 )
@@ -24,7 +27,6 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect

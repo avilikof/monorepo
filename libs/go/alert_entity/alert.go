@@ -2,6 +2,7 @@ package alert_entity
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"log"
 	"math/big"
 	"strconv"
@@ -18,6 +19,15 @@ type AlertEntity struct {
 
 func NewAlertEntity() AlertEntity {
 	return AlertEntity{}
+}
+func CreateAlertEntity(occurrenceId, description, state, alertId string, timestamp int64) AlertEntity {
+	return AlertEntity{
+		occurrenceId: occurrenceId,
+		timestamp:    timestamp,
+		description:  description,
+		state:        state,
+		alertId:      alertId,
+	}
 }
 func RandomAlert() AlertEntity {
 	return AlertEntity{
@@ -43,6 +53,9 @@ func (a *AlertEntity) GetState() string {
 }
 func (a *AlertEntity) GetAlertId() string {
 	return a.alertId
+}
+func (a *AlertEntity) ToByte() ([]byte, error) {
+	return json.Marshal(a)
 }
 
 func getRandomLetter() int64 {
