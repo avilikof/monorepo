@@ -1,0 +1,39 @@
+FROM golang:1.21.7-alpine as builder
+
+# Set working directory to the service1 directory
+WORKDIR /monorepo
+
+# Copy go.mod and go.sum files to download dependencies
+COPY ../apps/go/productivity_tool/alert_generator/go.mod ./apps/go/productivity_tool/alert_generator/go.mod
+COPY ../apps/go/productivity_tool/alert_generator/go.sum ./apps/go/productivity_tool/alert_generator/go.sum
+COPY ../apps/go/productivity_tool/alert_generator/.env ./apps/go/productivity_tool/alert_generator/.env
+
+
+# Copy the service1 source code and lib1 modules
+COPY ../apps/go/productivity_tool/alert_generator ./apps/go/productivity_tool/alert_generator
+COPY ../libs/go ./libs/go
+
+# Download dependencies
+RUN cd ./apps/go/productivity_tool/alert_generator && go mod tidy
+RUN cd ./apps/go/productivity_tool/alert_generator && go mod download
+
+# Build the service1 binary
+RUN apk add build-base
+#RUN apt install -y gcc
+#RUN apt install -y bash
+ENV CGO_ENABLED=1
+RUN cd ./apps/go/productivity_tool/alert_generator && go build -o alert_generator
+
+# Create a minimal image for the final stage
+FROM alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy the built binary from the builder stage
+COPY --from=builder /monorepo/apps/go/productivity_tool/alert_generator/alert_generator .
+COPY --from=builder /monorepo/apps/go/productivity_tool/alert_generator/.env .
+
+# Run the service when the container starts
+
+CMD ["./alert_generator"]
