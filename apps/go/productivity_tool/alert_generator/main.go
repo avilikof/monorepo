@@ -22,20 +22,20 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	value, _ := configurator.Get("APP_TEST")
-	valueTwo, _ := configurator.Get("TEST")
-	fmt.Println(value)
-	fmt.Println(valueTwo)
-
-	checkKafka(&configurator)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	client := kafka_driver.NewKafkaHandler(&configurator)
+	n := uint64(0)
 	go func(wg *sync.WaitGroup, k kafka_driver.KafkaHandler, a alert_entity.AlertEntity) {
+		log.Println("Start sending random alerts to stream")
 		defer wg.Done()
 		for {
-			err := randomAlertGeneration(&client, &alert)
+			n += 1
+			if n%1000 == 0 {
+				log.Printf("%v alerts produced\n", n)
+			}
+			err := generateRandomAlert(&client, &alert)
 			if err != nil {
 				log.Println(err)
 				break
@@ -43,52 +43,13 @@ func main() {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}(&wg, client, alert)
+	wg.Wait()
 }
 
-func randomAlertGeneration(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
+func generateRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
 	alertBytes, err := randomAlert.ToByte()
 	if err != nil {
 		return err
 	}
 	return kafkaHandler.Push([]byte("alert"), []byte(alertBytes), "alerts")
-}
-
-func checkKafka(envVars *env_var.EnvironmentVarHandler) {
-	client := kafka_driver.NewKafkaHandler(envVars)
-	err := client.Subscribe(envVars)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	fmt.Println(client.SubscriptionIsActive())
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		for i := 0; true; i++ {
-			msg, err := client.Get()
-			if err != nil {
-				log.Println(err, i)
-				break
-			}
-			if string(msg.Key) == "test" {
-				log.Printf("print by key: %v\n", string(msg.Value))
-			}
-			if i%1000 == 0 {
-				log.Printf("print by sequence: %v :: %v\n", string(msg.Value), i)
-			}
-		}
-	}(&wg)
-
-	key := "test"
-	value := "this is something awesome and working, what is awesome"
-	topic, _ := envVars.Get("KAFKA_TOPIC")
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		err := client.Push([]byte(key), []byte(value), topic)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(&wg)
-	wg.Wait()
 }
