@@ -95,7 +95,7 @@ func (a *AlertEntity) ToByte() ([]byte, error) {
 }
 
 func getRandomLetter() int64 {
-	biggestNumber := big.NewInt(10) // Convert biggestNumber value to big.Int
+	biggestNumber := big.NewInt(1000) // Convert biggestNumber value to big.Int
 	number, err := rand.Int(rand.Reader, biggestNumber)
 	if err != nil {
 		log.Printf("error getting random number: %v", err)
