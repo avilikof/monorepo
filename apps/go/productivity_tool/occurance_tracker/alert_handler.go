@@ -16,6 +16,7 @@ func NewOccurrenceHandler() OccurrenceHandler {
 func (h *OccurrenceHandler) handle(alert *alert_entity.AlertEntity) error {
 	if h.alertExistsInStorage(alert) {
 		log.Println("alert exists")
+		return nil
 	}
 	log.Println("writing alert to storage")
 	return h.pushToStorage(alert)

@@ -7,7 +7,6 @@ import (
 	"github.com/avilikof/monorepo/lib/go/kafka_driver"
 	"log"
 	"os"
-	"time"
 )
 
 func main() {
@@ -37,7 +36,7 @@ func readAlerts() {
 		if err != nil {
 			continue
 		}
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 	}
 }
 
@@ -57,6 +56,6 @@ func printMessage(kafka *kafka_driver.KafkaHandler, occHandler *OccurrenceHandle
 	if err != nil {
 		return err
 	}
-	log.Println(string(msg.Value))
+	//log.Println(string(msg.Value))
 	return nil
 }
