@@ -35,7 +35,7 @@ func main() {
 			if n%1000 == 0 {
 				log.Printf("%v alerts produced\n", n)
 			}
-			err := generateRandomAlert(&client, &alert)
+			err := produceRandomAlert(&client, &alert)
 			if err != nil {
 				log.Println(err)
 				break
@@ -46,10 +46,10 @@ func main() {
 	wg.Wait()
 }
 
-func generateRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
+func produceRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
 	alertBytes, err := randomAlert.ToByte()
 	if err != nil {
 		return err
 	}
-	return kafkaHandler.Push([]byte("alert"), []byte(alertBytes), "alerts")
+	return kafkaHandler.Push([]byte("alert"), alertBytes, "alerts")
 }

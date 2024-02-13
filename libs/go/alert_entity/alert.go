@@ -10,11 +10,11 @@ import (
 )
 
 type AlertEntity struct {
-	occurrenceId string
-	timestamp    int64
-	description  string
-	state        string
-	alertId      string
+	OccurrenceId string `json:"occurrenceId"`
+	Timestamp    int64  `json:"timestamp"`
+	Description  string `json:"description"`
+	State        string `json:"state"`
+	AlertId      string `json:"alertId"`
 }
 
 func NewAlertEntity() AlertEntity {
@@ -22,37 +22,37 @@ func NewAlertEntity() AlertEntity {
 }
 func CreateAlertEntity(occurrenceId, description, state, alertId string, timestamp int64) AlertEntity {
 	return AlertEntity{
-		occurrenceId: occurrenceId,
-		timestamp:    timestamp,
-		description:  description,
-		state:        state,
-		alertId:      alertId,
+		OccurrenceId: occurrenceId,
+		Timestamp:    timestamp,
+		Description:  description,
+		State:        state,
+		AlertId:      alertId,
 	}
 }
 func RandomAlert() AlertEntity {
 	return AlertEntity{
-		occurrenceId: "",
-		timestamp:    time.Now().UnixNano(),
-		description:  "random alert",
-		state:        getRandomState(),
-		alertId:      strconv.FormatInt(getRandomLetter(), 10),
+		OccurrenceId: "",
+		Timestamp:    time.Now().UnixNano(),
+		Description:  "random alert",
+		State:        getRandomState(),
+		AlertId:      strconv.FormatInt(getRandomLetter(), 10),
 	}
 }
 
 func (a *AlertEntity) GetOccurrenceId() string {
-	return a.occurrenceId
+	return a.OccurrenceId
 }
 func (a *AlertEntity) GetTimestamp() int64 {
-	return a.timestamp
+	return a.Timestamp
 }
 func (a *AlertEntity) GetDescription() string {
-	return a.description
+	return a.Description
 }
 func (a *AlertEntity) GetState() string {
-	return a.state
+	return a.State
 }
 func (a *AlertEntity) GetAlertId() string {
-	return a.alertId
+	return a.AlertId
 }
 func (a *AlertEntity) ToByte() ([]byte, error) {
 	return json.Marshal(a)
