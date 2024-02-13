@@ -27,10 +27,11 @@ func main() {
 	wg.Add(1)
 	client := kafka_driver.NewKafkaHandler(&configurator)
 	n := uint64(0)
-	go func(wg *sync.WaitGroup, k kafka_driver.KafkaHandler, a alert_entity.AlertEntity) {
+	go func(wg *sync.WaitGroup, k kafka_driver.KafkaHandler) {
 		log.Println("Start sending random alerts to stream")
 		defer wg.Done()
 		for {
+			alert := alert_entity.RandomAlert()
 			n += 1
 			if n%1000 == 0 {
 				log.Printf("%v alerts produced\n", n)
@@ -42,7 +43,7 @@ func main() {
 			}
 			time.Sleep(100 * time.Millisecond)
 		}
-	}(&wg, client, alert)
+	}(&wg, client)
 	wg.Wait()
 }
 

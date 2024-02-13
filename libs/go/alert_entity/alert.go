@@ -3,6 +3,7 @@ package alert_entity
 import (
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/big"
 	"strconv"
@@ -17,8 +18,8 @@ type AlertEntity struct {
 	AlertId      string `json:"alertId"`
 }
 
-func NewAlertEntity() AlertEntity {
-	return AlertEntity{}
+func NewAlertEntity() *AlertEntity {
+	return &AlertEntity{}
 }
 func CreateAlertEntity(occurrenceId, description, state, alertId string, timestamp int64) AlertEntity {
 	return AlertEntity{
@@ -29,6 +30,38 @@ func CreateAlertEntity(occurrenceId, description, state, alertId string, timesta
 		AlertId:      alertId,
 	}
 }
+
+func NewAlertEntityFromBytes(data []byte) (*AlertEntity, error) {
+	var entity AlertEntity
+	err := json.Unmarshal(data, &entity)
+	if err != nil {
+		return nil, err
+	}
+	if entity == *NewAlertEntity() {
+		return nil, fmt.Errorf("empty alert")
+	}
+	return &entity, nil
+}
+
+//func main() {
+//	// Example JSON data
+//	jsonData := []byte(`{
+//		"occurrenceId": "12345",
+//		"timestamp": 161803398874989,
+//		"description": "Example alert description",
+//		"state": "active",
+//		"alertId": "alert123"
+//	}`)
+//
+//	// Create an AlertEntity from []byte
+//	alertEntity, err := NewAlertEntityFromBytes(jsonData)
+//	if err != nil {
+//		log.Fatalf("Error creating AlertEntity from bytes: %v", err)
+//	}
+//
+//	fmt.Printf("AlertEntity: %+v\n", alertEntity)
+//}
+
 func RandomAlert() AlertEntity {
 	return AlertEntity{
 		OccurrenceId: "",
@@ -55,6 +88,9 @@ func (a *AlertEntity) GetAlertId() string {
 	return a.AlertId
 }
 func (a *AlertEntity) ToByte() ([]byte, error) {
+	if *a == *NewAlertEntity() {
+		return nil, fmt.Errorf("alert contains no data")
+	}
 	return json.Marshal(a)
 }
 
@@ -76,4 +112,8 @@ func getRandomState() string {
 		log.Printf("error getting random nuber: %v", err)
 	}
 	return state[num.Int64()]
+}
+
+func alertIsEmpty(alert *AlertEntity) bool {
+	return *alert == AlertEntity{}
 }
