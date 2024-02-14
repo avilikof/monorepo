@@ -36,7 +36,6 @@ func readAlerts() {
 		if err != nil {
 			continue
 		}
-		//time.Sleep(1 * time.Second)
 	}
 }
 
@@ -52,10 +51,9 @@ func printMessage(kafka *kafka_driver.KafkaHandler, occHandler *OccurrenceHandle
 	if err != nil {
 		return err
 	}
-	err = occHandler.handle(alert)
+	err = occHandler.Handle(alert)
 	if err != nil {
 		return err
 	}
-	//log.Println(string(msg.Value))
 	return nil
 }

@@ -87,6 +87,17 @@ func (a *AlertEntity) GetState() string {
 func (a *AlertEntity) GetAlertId() string {
 	return a.AlertId
 }
+func (a *AlertEntity) SetDescription(desc string) error {
+	a.Description = desc
+	return nil
+}
+func (a *AlertEntity) SetOccurrenceId(id string) error {
+	if a.OccurrenceId != "" {
+		return fmt.Errorf("occurrenceId is set, cannot change")
+	}
+	a.OccurrenceId = id
+	return nil
+}
 func (a *AlertEntity) ToByte() ([]byte, error) {
 	if *a == *NewAlertEntity() {
 		return nil, fmt.Errorf("alert contains no data")
