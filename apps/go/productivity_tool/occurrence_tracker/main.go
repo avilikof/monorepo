@@ -51,7 +51,7 @@ func printMessage(kafka *kafka_driver.KafkaHandler, occHandler *OccurrenceHandle
 	if err != nil {
 		return err
 	}
-	err = occHandler.Handle(alert)
+	err = occHandler.Handle(*alert)
 	if err != nil {
 		return err
 	}
