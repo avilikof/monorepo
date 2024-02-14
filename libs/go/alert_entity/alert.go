@@ -98,6 +98,13 @@ func (a *AlertEntity) SetOccurrenceId(id string) error {
 	a.OccurrenceId = id
 	return nil
 }
+func (a *AlertEntity) SetState(state string) error {
+	if state != "firing" && state != "resolved" {
+		return fmt.Errorf("unsuported state provided")
+	}
+	a.State = state
+	return nil
+}
 func (a *AlertEntity) ToByte() ([]byte, error) {
 	if *a == *NewAlertEntity() {
 		return nil, fmt.Errorf("alert contains no data")
@@ -106,7 +113,7 @@ func (a *AlertEntity) ToByte() ([]byte, error) {
 }
 
 func getRandomLetter() int64 {
-	biggestNumber := big.NewInt(1000) // Convert biggestNumber value to big.Int
+	biggestNumber := big.NewInt(10) // Convert biggestNumber value to big.Int
 	number, err := rand.Int(rand.Reader, biggestNumber)
 	if err != nil {
 		log.Printf("error getting random number: %v", err)
