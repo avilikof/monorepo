@@ -9,8 +9,8 @@ import (
 type EnvironmentVarHandler struct{}
 
 func NewEnvVarHandler() (EnvironmentVarHandler, error) {
-	err := loadSystemVariables()
-	return EnvironmentVarHandler{}, err
+	_err := loadSystemVariables()
+	return EnvironmentVarHandler{}, _err
 }
 
 func loadSystemVariables() error {
@@ -22,8 +22,8 @@ func (e *EnvironmentVarHandler) LoadDotEnv(fullPath string) error {
 	dir, file := filepath.Split(fullPath)
 	viper.AddConfigPath(dir)
 	viper.SetConfigFile(file)
-	if err := viper.ReadInConfig(); err != nil {
-		return err
+	if _err := viper.ReadInConfig(); _err != nil {
+		return _err
 	}
 	return nil
 }

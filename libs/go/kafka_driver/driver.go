@@ -23,27 +23,27 @@ func (kh *KafkaHandler) Subscribe(envVars *env_var.EnvironmentVarHandler) error 
 		return nil
 	}
 
-	configMap, err := newConfigMap(envVars)
-	if err != nil {
-		return err
+	configMap, _err := newConfigMap(envVars)
+	if _err != nil {
+		return _err
 	}
 
-	groupId, offset, err := getConsumerEnvVars(envVars)
-	if err != nil {
-		return err
+	groupId, offset, _err := getConsumerEnvVars(envVars)
+	if _err != nil {
+		return _err
 	}
 
-	cons, err := createKafkaConsumer(groupId, offset, configMap)
-	if err != nil {
-		return err
+	cons, _err := createKafkaConsumer(groupId, offset, configMap)
+	if _err != nil {
+		return _err
 	}
-	topic, err := envVars.Get("KAFKA_TOPIC")
-	if err != nil {
-		return err
+	topic, _err := envVars.Get("KAFKA_TOPIC")
+	if _err != nil {
+		return _err
 	}
-	err = cons.Subscribe(topic, nil)
-	if err != nil {
-		return err
+	_err = cons.Subscribe(topic, nil)
+	if _err != nil {
+		return _err
 	}
 	return kh.setConsumer(cons)
 }
@@ -72,32 +72,32 @@ func (kh *KafkaHandler) setProducer(producer *kafka.Producer) error {
 	return nil
 }
 func (kh *KafkaHandler) Get() (kafka.Message, error) {
-	message, err := kh.consumer.ReadMessage(120 * time.Second)
-	if err != nil {
-		return kafka.Message{}, err
+	message, _err := kh.consumer.ReadMessage(120 * time.Second)
+	if _err != nil {
+		return kafka.Message{}, _err
 	}
 	return *message, nil
 }
 func (kh *KafkaHandler) Push(key, value []byte, topic string) error {
 
 	if kh.cfgMap == nil {
-		cfgMap, err := newConfigMap(kh.envVars)
-		if err != nil {
-			return err
+		cfgMap, _err := newConfigMap(kh.envVars)
+		if _err != nil {
+			return _err
 		}
-		err = kh.setConfigMap(cfgMap)
-		if err != nil {
-			return err
+		_err = kh.setConfigMap(cfgMap)
+		if _err != nil {
+			return _err
 		}
 	}
 	if kh.producer == nil || !kh.ProducerIsAlive() {
-		producer, err := createKafkaProducer(kh.cfgMap)
-		if err != nil {
-			return err
+		producer, _err := createKafkaProducer(kh.cfgMap)
+		if _err != nil {
+			return _err
 		}
-		err = kh.setProducer(producer)
-		if err != nil {
-			return err
+		_err = kh.setProducer(producer)
+		if _err != nil {
+			return _err
 		}
 	}
 	kafkaMessage := createMessage(key, value, topic)
@@ -106,29 +106,29 @@ func (kh *KafkaHandler) Push(key, value []byte, topic string) error {
 
 func getConsumerEnvVars(envVars *env_var.EnvironmentVarHandler) (string, string, error) {
 
-	groupId, err := envVars.Get("GROUP_ID")
-	if err != nil {
-		return "", "", err
+	groupId, _err := envVars.Get("GROUP_ID")
+	if _err != nil {
+		return "", "", _err
 	}
 
-	offset, err := envVars.Get("KAFKA_OFFSET")
-	if err != nil {
-		return "", "", err
+	offset, _err := envVars.Get("KAFKA_OFFSET")
+	if _err != nil {
+		return "", "", _err
 	}
 	return groupId, offset, nil
 }
 func newConfigMap(envVars *env_var.EnvironmentVarHandler) (*kafka.ConfigMap, error) {
-	kafkaBootstrap, err := envVars.Get("KAFKA_URL")
-	if err != nil {
-		return nil, err
+	kafkaBootstrap, _err := envVars.Get("KAFKA_URL")
+	if _err != nil {
+		return nil, _err
 	}
-	kafkaUser, err := envVars.Get("KAFKA_USER")
-	if err != nil {
-		return nil, err
+	kafkaUser, _err := envVars.Get("KAFKA_USER")
+	if _err != nil {
+		return nil, _err
 	}
-	kafkaPass, err := envVars.Get("KAFKA_PASS")
-	if err != nil {
-		return nil, err
+	kafkaPass, _err := envVars.Get("KAFKA_PASS")
+	if _err != nil {
+		return nil, _err
 	}
 
 	configMap := &kafka.ConfigMap{
@@ -141,20 +141,20 @@ func newConfigMap(envVars *env_var.EnvironmentVarHandler) (*kafka.ConfigMap, err
 	return configMap, nil
 }
 func createKafkaConsumer(groupId, offset string, cfg *kafka.ConfigMap) (*kafka.Consumer, error) {
-	err := cfg.SetKey("group.id", groupId)
-	if err != nil {
-		fmt.Printf("failed to add groupId to consumer configuration: %v", err)
-		return nil, err
+	_err := cfg.SetKey("group.id", groupId)
+	if _err != nil {
+		fmt.Printf("failed to add groupId to consumer configuration: %v", _err)
+		return nil, _err
 	}
-	err = cfg.SetKey("auto.offset.reset", offset)
-	if err != nil {
-		fmt.Printf("failed to add offset to consumer configuration: %v\n", err)
-		return nil, err
+	_err = cfg.SetKey("auto.offset.reset", offset)
+	if _err != nil {
+		fmt.Printf("failed to add offset to consumer configuration: %v\n", _err)
+		return nil, _err
 	}
-	err = cfg.SetKey("session.timeout.ms", 60000)
-	if err != nil {
-		fmt.Printf("failed to add session.timeout.ms to consumer configuration: %v\n", err)
-		return nil, err
+	_err = cfg.SetKey("session.timeout.ms", 60000)
+	if _err != nil {
+		fmt.Printf("failed to add session.timeout.ms to consumer configuration: %v\n", _err)
+		return nil, _err
 	}
 
 	return kafka.NewConsumer(cfg)

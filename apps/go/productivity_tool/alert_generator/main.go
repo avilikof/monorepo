@@ -14,13 +14,13 @@ func main() {
 	println("Main started..")
 	alert := alert_entity.RandomAlert()
 	fmt.Printf("%+v\n", alert)
-	configurator, err := env_var.NewEnvVarHandler()
-	if err != nil {
-		fmt.Println(err)
+	configurator, _err := env_var.NewEnvVarHandler()
+	if _err != nil {
+		fmt.Println(_err)
 	}
-	err = configurator.LoadDotEnv(".env")
-	if err != nil {
-		fmt.Println(err)
+	_err = configurator.LoadDotEnv(".env")
+	if _err != nil {
+		fmt.Println(_err)
 	}
 
 	var wg sync.WaitGroup
@@ -36,9 +36,9 @@ func main() {
 			if n%1000 == 0 {
 				log.Printf("%v alerts produced\n", n)
 			}
-			err := produceRandomAlert(&client, &alert)
-			if err != nil {
-				log.Println(err)
+			_err := produceRandomAlert(&client, &alert)
+			if _err != nil {
+				log.Println(_err)
 				break
 			}
 			time.Sleep(1000 * time.Millisecond)
@@ -48,9 +48,9 @@ func main() {
 }
 
 func produceRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
-	alertBytes, err := randomAlert.ToByte()
-	if err != nil {
-		return err
+	alertBytes, _err := randomAlert.ToByte()
+	if _err != nil {
+		return _err
 	}
 	return kafkaHandler.Push([]byte("alert"), alertBytes, "alerts")
 }

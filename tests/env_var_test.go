@@ -11,34 +11,34 @@ import (
 
 // TestNewEnvVarHandler tests the initialization of the EnvironmentVarHandler.
 func TestNewEnvVarHandler(t *testing.T) {
-	_, err := env_var.NewEnvVarHandler()
-	assert.NoError(t, err)
+	_, _err := env_var.NewEnvVarHandler()
+	assert.NoError(t, _err)
 }
 
 // TestLoadDotEnv tests loading environment variables from a .env file.
 func TestLoadDotEnv(t *testing.T) {
 	// Setup: Create a temporary .env file.
-	file, err := os.Create("./.env")
-	if err != nil {
-		t.Fatalf("Unable to create temporary .env file: %v", err)
+	file, _err := os.Create("./.env")
+	if _err != nil {
+		t.Fatalf("Unable to create temporary .env file: %v", _err)
 	}
 	defer os.Remove(file.Name()) // Clean up
 
-	_, err = file.WriteString("TEST_VAR=hello\n")
-	if err != nil {
-		t.Fatalf("Unable to write to temporary .env file: %v", err)
+	_, _err = file.WriteString("TEST_VAR=hello\n")
+	if _err != nil {
+		t.Fatalf("Unable to write to temporary .env file: %v", _err)
 	}
 	file.Close()
 
-	handler, err := env_var.NewEnvVarHandler()
-	assert.NoError(t, err)
+	handler, _err := env_var.NewEnvVarHandler()
+	assert.NoError(t, _err)
 
-	err = handler.LoadDotEnv(file.Name())
-	assert.NoError(t, err)
+	_err = handler.LoadDotEnv(file.Name())
+	assert.NoError(t, _err)
 
 	// Test retrieving the variable set in the .env file
-	val, err := handler.Get("TEST_VAR")
-	assert.NoError(t, err)
+	val, _err := handler.Get("TEST_VAR")
+	assert.NoError(t, _err)
 	assert.Equal(t, "hello", val)
 }
 
@@ -48,25 +48,25 @@ func TestGet(t *testing.T) {
 	const testValue = "some_value"
 
 	// Setup: Set an environment variable
-	err := os.Setenv(testKey, testValue)
-	if err != nil {
-		log.Println(err)
+	_err := os.Setenv(testKey, testValue)
+	if _err != nil {
+		log.Println(_err)
 	}
 	defer os.Unsetenv(testKey) // Clean up
 
-	handler, err := env_var.NewEnvVarHandler()
-	assert.NoError(t, err)
+	handler, _err := env_var.NewEnvVarHandler()
+	assert.NoError(t, _err)
 
 	// Test retrieving the variable
-	val, err := handler.Get(testKey)
-	assert.NoError(t, err)
+	val, _err := handler.Get(testKey)
+	assert.NoError(t, _err)
 	assert.Equal(t, testValue, val)
 
 	// Test retrieving a non-existent variable
-	_, err = handler.Get("NON_EXISTENT_VAR")
-	assert.Error(t, err)
+	_, _err = handler.Get("NON_EXISTENT_VAR")
+	assert.Error(t, _err)
 
 	// Test retrieving with an empty key
-	_, err = handler.Get("")
-	assert.Error(t, err)
+	_, _err = handler.Get("")
+	assert.Error(t, _err)
 }

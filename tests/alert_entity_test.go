@@ -28,8 +28,8 @@ func TestRandomAlert(t *testing.T) {
 		t.Errorf("RandomAlert() failed, state %s is not expected", alert.GetState())
 	}
 
-	alertId, err := strconv.ParseInt(alert.GetAlertId(), 10, 64)
-	if err != nil || alertId < 1 || alertId > 10 {
+	alertId, _err := strconv.ParseInt(alert.GetAlertId(), 10, 64)
+	if _err != nil || alertId < 1 || alertId > 10 {
 		t.Errorf("RandomAlert() failed, alertId %s is out of expected range", alert.GetAlertId())
 	}
 }

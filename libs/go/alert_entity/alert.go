@@ -33,9 +33,9 @@ func CreateAlertEntity(occurrenceId, description, state, alertId string, timesta
 
 func NewAlertEntityFromBytes(data []byte) (*AlertEntity, error) {
 	var entity AlertEntity
-	err := json.Unmarshal(data, &entity)
-	if err != nil {
-		return nil, err
+	_err := json.Unmarshal(data, &entity)
+	if _err != nil {
+		return nil, _err
 	}
 	if entity == *NewAlertEntity() {
 		return nil, fmt.Errorf("empty alert")
@@ -54,9 +54,9 @@ func NewAlertEntityFromBytes(data []byte) (*AlertEntity, error) {
 //	}`)
 //
 //	// Create an AlertEntity from []byte
-//	alertEntity, err := NewAlertEntityFromBytes(jsonData)
-//	if err != nil {
-//		log.Fatalf("Error creating AlertEntity from bytes: %v", err)
+//	alertEntity, _err := NewAlertEntityFromBytes(jsonData)
+//	if _err != nil {
+//		log.Fatalf("Error creating AlertEntity from bytes: %v", _err)
 //	}
 //
 //	fmt.Printf("AlertEntity: %+v\n", alertEntity)
@@ -114,9 +114,9 @@ func (a *AlertEntity) ToByte() ([]byte, error) {
 
 func getRandomLetter() int64 {
 	biggestNumber := big.NewInt(10) // Convert biggestNumber value to big.Int
-	number, err := rand.Int(rand.Reader, biggestNumber)
-	if err != nil {
-		log.Printf("error getting random number: %v", err)
+	number, _err := rand.Int(rand.Reader, biggestNumber)
+	if _err != nil {
+		log.Printf("error getting random number: %v", _err)
 		return 0
 	}
 	return number.Int64() + 1 // Add 1 to get 1-10 range
@@ -125,9 +125,9 @@ func getRandomLetter() int64 {
 func getRandomState() string {
 	state := []string{"firing", "resolved"}
 	biggestNumber := big.NewInt(int64(len(state)))
-	num, err := rand.Int(rand.Reader, biggestNumber)
-	if err != nil {
-		log.Printf("error getting random nuber: %v", err)
+	num, _err := rand.Int(rand.Reader, biggestNumber)
+	if _err != nil {
+		log.Printf("error getting random nuber: %v", _err)
 	}
 	return state[num.Int64()]
 }

@@ -26,9 +26,9 @@ func (h *OccurrenceHandler) Handle(alert alert_entity.AlertEntity) error {
 	return nil
 }
 func (h *OccurrenceHandler) existingAlert(alert *alert_entity.AlertEntity) error {
-	oldAlert, err := h.getAlertFromStorage(alert)
-	if err != nil {
-		return err
+	oldAlert, _err := h.getAlertFromStorage(alert)
+	if _err != nil {
+		return _err
 	}
 	if alert.GetState() == "firing" {
 		if oldAlert.GetState() == "firing" {
@@ -47,9 +47,9 @@ func (h *OccurrenceHandler) getAlertFromStorage(alert *alert_entity.AlertEntity)
 		if !ok {
 			return alert_entity.AlertEntity{}, fmt.Errorf("failed to get alert from internal storage")
 		}
-		oldAlert, err := alert_entity.NewAlertEntityFromBytes(oldAlertBytes)
-		if err != nil {
-			return alert_entity.AlertEntity{}, err
+		oldAlert, _err := alert_entity.NewAlertEntityFromBytes(oldAlertBytes)
+		if _err != nil {
+			return alert_entity.AlertEntity{}, _err
 		}
 		return *oldAlert, nil
 	}
@@ -62,9 +62,9 @@ func (h *OccurrenceHandler) alertExistsInStorage(alert *alert_entity.AlertEntity
 }
 
 func (h *OccurrenceHandler) pushToStorage(alert alert_entity.AlertEntity) error {
-	alertBytes, err := alert.ToByte()
-	if err != nil {
-		return err
+	alertBytes, _err := alert.ToByte()
+	if _err != nil {
+		return _err
 	}
 	log.Println(alert)
 	h.internalStorage[alert.GetAlertId()] = alertBytes
@@ -73,26 +73,26 @@ func (h *OccurrenceHandler) pushToStorage(alert alert_entity.AlertEntity) error 
 
 func (h *OccurrenceHandler) newOccurrence(reopen bool, alert *alert_entity.AlertEntity) error {
 	if reopen {
-		err := alert.SetDescription(alert.GetDescription() + " reopen ")
-		if err != nil {
-			return err
+		_err := alert.SetDescription(alert.GetDescription() + " reopen ")
+		if _err != nil {
+			return _err
 		}
 	}
-	err := alert.SetOccurrenceId(strconv.FormatInt(time.Now().UnixNano(), 10))
-	if err != nil {
-		return err
+	_err := alert.SetOccurrenceId(strconv.FormatInt(time.Now().UnixNano(), 10))
+	if _err != nil {
+		return _err
 	}
 	return h.pushToStorage(*alert)
 }
 
 func (h *OccurrenceHandler) resolve(alert *alert_entity.AlertEntity) error {
-	oldAlert, err := h.getAlertFromStorage(alert)
-	if err != nil {
-		return err
+	oldAlert, _err := h.getAlertFromStorage(alert)
+	if _err != nil {
+		return _err
 	}
-	err = oldAlert.SetState("resolved")
-	if err != nil {
-		return err
+	_err = oldAlert.SetState("resolved")
+	if _err != nil {
+		return _err
 	}
 	return h.pushToStorage(oldAlert)
 }
