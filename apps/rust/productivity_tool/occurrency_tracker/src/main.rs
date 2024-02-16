@@ -1,34 +1,26 @@
 mod alert_handler;
 
 use std::env;
-use std::process::exit;
 
+use crate::alert_handler::AlertHandler;
 use alert_entity::AlertEntity;
 use env_loader::load::load;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient};
-use log::{debug, error, info};
+use log::{error, info};
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
     // Load path is - monorepo/libs/rust/env_loader
-    if let Err(_err) = load(".env") {
+    if let Err(_err) = load("../../../.env") {
         error!("failed to load .env values")
-    }
-    match env::var("TEST") {
-        Ok(val) => {
-            println!("{val}")
-        }
-        Err(error) => {
-            println!("{error}");
-            exit(0)
-        }
     }
 
     let config = set_kafka_config();
     let client = create_kafka_client(&config);
+    let mut repo = repository::InMem::default();
     loop {
-        read_message(&client).await;
+        read_message(&client, &mut repo).await;
     }
 }
 
@@ -44,21 +36,19 @@ fn create_kafka_client(config: &KafkaClientConfig) -> KafkaConsumerClient {
     KafkaConsumerClient::connect(config)
 }
 
-async fn read_message(client: &KafkaConsumerClient) {
+async fn read_message(client: &KafkaConsumerClient, repo: &mut repository::InMem) {
     client.subscribe(&["alerts"]);
     match client.get_message().await {
         None => {}
         Some(msg) => match AlertEntity::from_bytes(&msg) {
-            Ok(mut alert) => {
-                debug!("{:?}", alert);
-                debug!(
-                    "{:?}",
-                    String::from_utf8(alert.to_bytes().unwrap()).unwrap()
-                );
+            Ok(alert) => {
+                let mut alert_handler = AlertHandler::init(&alert, repo);
+                info!("{:?}", alert);
+                info!("{}", alert_handler.alert_is_new());
             }
             Err(err) => {
-                debug!("{:?}", err);
-                debug!("{:?}", String::from_utf8(msg));
+                info!("{:?}", err);
+                info!("{:?}", String::from_utf8(msg));
             }
         },
     }

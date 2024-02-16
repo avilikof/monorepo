@@ -5,7 +5,7 @@ use rand::Rng;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq)]
 pub enum AlertState {
     Firing,
     Resolved,
@@ -34,7 +34,7 @@ impl AlertEntity {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, serde_json::Error> {
         convert_empty_str_to_none(serde_json::from_slice(bytes))
     }
-    pub fn to_bytes(&mut self) -> serde_json::Result<Vec<u8>> {
+    pub fn as_bytes(&mut self) -> serde_json::Result<Vec<u8>> {
         serde_json::to_vec(&convert_none_to_empty_string(self))
     }
     pub fn get_occurrence_id(&self) -> Option<&str> {

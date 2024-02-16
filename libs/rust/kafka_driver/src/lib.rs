@@ -44,7 +44,6 @@ impl KafkaConsumerClient {
             "no kafka consumer subscription found, subscribing to: {:?}",
             topics
         );
-        // self.get_consumer_info(topics.first().to_owned().unwrap())
         self.get_current_offset();
     }
 

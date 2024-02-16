@@ -9,6 +9,7 @@ edition = "2021"
 env_loader = { workspace = true }
 kafka_driver = { workspace = true}
 alert_entity = {workspace = true}
+repository = { workspace = true}
 log = "0.4.20"
 env_logger = "0.11.2"
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
