@@ -2,3 +2,4 @@
 .idea
 target
 /apps/go/productivity_tool/alert_generator/alert_generator
+*.iml

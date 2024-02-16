@@ -1,3 +1,4 @@
+use log::{error, info};
 use std::path::Path;
 use std::{env, fs};
 
@@ -45,8 +46,8 @@ pub mod load {
 fn file_exists(path_str: &str) -> Result<(), EnvLoaderError> {
     let path = Path::new(path_str);
     match env::current_dir() {
-        Ok(path) => println!("Current path is: {}", path.display()),
-        Err(e) => println!("Error retrieving current path: {}", e),
+        Ok(path) => info!("Current path is: {}", path.display()),
+        Err(e) => error!("Error retrieving current path: {}", e),
     }
     if fs::metadata(path).is_ok() {
         Ok(())
