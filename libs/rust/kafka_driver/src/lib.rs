@@ -71,7 +71,7 @@ impl KafkaConsumerClient {
             .collect()
     }
 
-    fn get_consumer_info(&self, topic: &str) {
+    fn _get_consumer_info(&self, topic: &str) {
         for t in self
             .consumer
             .fetch_metadata(Some(topic), Duration::from_secs(2))
