@@ -1,5 +1,5 @@
-use std::fs;
 use std::path::Path;
+use std::{env, fs};
 
 /// Custom error type for environment loading operations.
 #[derive(Debug, PartialEq)]
@@ -10,7 +10,7 @@ pub enum EnvLoaderError {
 
 /// Module for environment loading functionality.
 pub mod load {
-    use crate::{EnvLoaderError, file_exists};
+    use crate::{file_exists, EnvLoaderError};
     use dotenv::from_filename;
 
     /// Loads environment variables from a specified .env file.
@@ -27,7 +27,7 @@ pub mod load {
             Ok(_) => {
                 from_filename(path).ok();
                 Ok(())
-            },
+            }
             Err(err) => Err(err),
         }
     }
@@ -44,13 +44,16 @@ pub mod load {
 /// A result indicating success (`Ok(())`) if the file exists, or an `EnvLoaderError::FileNotFound` if not.
 fn file_exists(path_str: &str) -> Result<(), EnvLoaderError> {
     let path = Path::new(path_str);
+    match env::current_dir() {
+        Ok(path) => println!("Current path is: {}", path.display()),
+        Err(e) => println!("Error retrieving current path: {}", e),
+    }
     if fs::metadata(path).is_ok() {
         Ok(())
     } else {
         Err(EnvLoaderError::FileNotFound)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -76,16 +79,16 @@ mod tests {
 
 #[cfg(test)]
 mod env_loader_tests {
-    use std::env;
     use super::*;
     use crate::load::load;
+    use std::env;
 
     #[test]
     fn test_load_env_file_exists() {
         let path = ".env";
         match load(path) {
             Ok(_) => assert_eq!(env::var("TEST_VALUE").unwrap(), String::from("exists")),
-            Err(err) => assert_eq!(err, EnvLoaderError::FileNotFound)
+            Err(err) => assert_eq!(err, EnvLoaderError::FileNotFound),
         }
     }
 
