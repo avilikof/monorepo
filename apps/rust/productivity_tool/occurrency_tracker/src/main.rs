@@ -44,12 +44,23 @@ async fn read_message(client: &KafkaConsumerClient, repo: &mut repository::InMem
             Ok(alert) => {
                 let mut alert_handler = AlertHandler::init(&alert, repo);
                 info!("{:?}", alert);
-                info!("{}", alert_handler.alert_is_new());
+                alert_handler.occurrence_handling_flow();
+                // print_from_storage(repo, alert.get_alert_id())
             }
             Err(err) => {
                 info!("{:?}", err);
                 info!("{:?}", String::from_utf8(msg));
             }
         },
+    }
+}
+
+fn print_from_storage(repo: &repository::InMem, id: &str) {
+    match repo.get(id) {
+        None => {}
+        Some(m) => {
+            let alert = AlertEntity::from_bytes(&m);
+            println!("{:?}", alert)
+        }
     }
 }

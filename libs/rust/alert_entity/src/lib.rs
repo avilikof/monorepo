@@ -55,7 +55,7 @@ impl AlertEntity {
     pub fn get_alert_id(&self) -> &str {
         self.alert_id.as_str()
     }
-    pub fn set_occurrence_id(&mut self, id: Option<String>) {
+    fn convert_occurrence_id(&mut self, id: Option<String>) {
         match &self.occurrence_id {
             Some(o) => {
                 if o.is_empty() {
@@ -65,6 +65,23 @@ impl AlertEntity {
                 }
             }
             None => self.occurrence_id = id.to_owned(),
+        }
+    }
+    pub fn set_occurrence_id(&mut self) {
+        match &self.occurrence_id {
+            None => {
+                self.occurrence_id = Some(get_random_number(10).to_string());
+            }
+            Some(id) => {
+                error!("cannot set ID it already exists: '{}'", id)
+            }
+        }
+    }
+    pub fn set_state(&mut self, state: AlertState) {
+        if state == self.get_state().clone() {
+            warn!("trying to update alert state with same value")
+        } else {
+            self.state = state
         }
     }
 }
@@ -99,7 +116,7 @@ fn convert_empty_str_to_none(
         Ok(mut a) => match &a.occurrence_id {
             Some(o) => {
                 if o.is_empty() {
-                    a.set_occurrence_id(None);
+                    a.convert_occurrence_id(None);
                 }
                 Ok(a)
             }
@@ -112,7 +129,7 @@ fn convert_empty_str_to_none(
 fn convert_none_to_empty_string(alert: &mut AlertEntity) -> AlertEntity {
     match alert.get_occurrence_id() {
         None => {
-            alert.set_occurrence_id(Some("".to_string()));
+            alert.convert_occurrence_id(Some("".to_string()));
             alert.to_owned()
         }
         Some(_) => alert.to_owned(),
