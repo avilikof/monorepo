@@ -6,14 +6,13 @@ import (
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/avilikof/monorepo/lib/go/kafka_driver"
 	"log"
+	"strconv"
 	"sync"
 	"time"
 )
 
 func main() {
 	println("Main started..")
-	alert := alert_entity.RandomAlert()
-	fmt.Printf("%+v\n", alert)
 	configurator, _err := env_var.NewEnvVarHandler()
 	if _err != nil {
 		fmt.Println(_err)
@@ -31,7 +30,9 @@ func main() {
 		log.Println("Start sending random alerts to stream")
 		defer wg.Done()
 		for {
-			alert := alert_entity.RandomAlert()
+			largestNumberStr, err := configurator.Get("LARGEST_NUMBER")
+			largestNumber, err := strconv.ParseInt(largestNumberStr, 10, 64)
+			alert := alert_entity.RandomAlert(largestNumber)
 			n += 1
 			if n%1000 == 0 {
 				log.Printf("%v alerts produced\n", n)
@@ -41,7 +42,12 @@ func main() {
 				log.Println(_err)
 				break
 			}
-			time.Sleep(1000 * time.Millisecond)
+			interval, err := configurator.Get("GENERATOR_INTERVAL")
+			if err != nil {
+				log.Println(err)
+			}
+			val, err := strconv.ParseInt(interval, 10, 64)
+			time.Sleep(time.Duration(val) * time.Millisecond)
 		}
 	}(&wg, client)
 	wg.Wait()
