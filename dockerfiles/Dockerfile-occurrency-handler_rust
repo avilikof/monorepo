@@ -18,7 +18,7 @@ RUN apt-get install -y openssl
 RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && RUST_LOG=debug cargo build
 
 # Create a minimal image for the final stage
-FROM  rust:1.74-slim as template-rust
+FROM  rust:latest
 
 # Set working directory
 WORKDIR /app
