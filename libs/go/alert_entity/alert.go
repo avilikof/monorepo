@@ -43,32 +43,13 @@ func NewAlertEntityFromBytes(data []byte) (*AlertEntity, error) {
 	return &entity, nil
 }
 
-//func main() {
-//	// Example JSON data
-//	jsonData := []byte(`{
-//		"occurrenceId": "12345",
-//		"timestamp": 161803398874989,
-//		"description": "Example alert description",
-//		"state": "active",
-//		"alertId": "alert123"
-//	}`)
-//
-//	// Create an AlertEntity from []byte
-//	alertEntity, _err := NewAlertEntityFromBytes(jsonData)
-//	if _err != nil {
-//		log.Fatalf("Error creating AlertEntity from bytes: %v", _err)
-//	}
-//
-//	fmt.Printf("AlertEntity: %+v\n", alertEntity)
-//}
-
-func RandomAlert() AlertEntity {
+func RandomAlert(largestNumber int64) AlertEntity {
 	return AlertEntity{
 		OccurrenceId: "",
 		Timestamp:    time.Now().UnixNano(),
 		Description:  "random alert",
 		State:        getRandomState(),
-		AlertId:      strconv.FormatInt(getRandomLetter(), 10),
+		AlertId:      strconv.FormatInt(getRandomLetter(largestNumber), 10),
 	}
 }
 
@@ -112,8 +93,8 @@ func (a *AlertEntity) ToByte() ([]byte, error) {
 	return json.Marshal(a)
 }
 
-func getRandomLetter() int64 {
-	biggestNumber := big.NewInt(10) // Convert biggestNumber value to big.Int
+func getRandomLetter(largestNumber int64) int64 {
+	biggestNumber := big.NewInt(largestNumber) // Convert biggestNumber value to big.Int
 	number, _err := rand.Int(rand.Reader, biggestNumber)
 	if _err != nil {
 		log.Printf("error getting random number: %v", _err)
