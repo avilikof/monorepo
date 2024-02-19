@@ -1,0 +1,33 @@
+FROM rust:latest as builder
+
+# Set working directory to the service1 directory
+WORKDIR /monorepo
+
+# Copy the service1 source code and lib1 modules
+COPY ../apps/rust/productivity_tool/occurrency_tracker/Cargo.toml /monorepo/apps/rust/productivity_tool/occurrency_tracker/Cargo.lock
+COPY ../apps/rust/productivity_tool/occurrency_tracker /monorepo/apps/rust/productivity_tool/occurrency_tracker
+COPY ../Cargo.toml .
+COPY ../Cargo.lock .
+COPY ../libs/rust ./libs/rust
+COPY ../.env .
+
+
+RUN apt-get update -y
+RUN apt-get install -y libsasl2-dev
+RUN apt-get install -y openssl
+RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && RUST_LOG=debug cargo build
+
+# Create a minimal image for the final stage
+FROM  rust:1.74-slim as template-rust
+
+# Set working directory
+WORKDIR /app
+
+
+# Copy the built binary from the builder stage
+COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrency_tracker/target/debug/occurrency_tracker .
+#COPY --from=builder /monorepo/.env ./
+
+# Run the service when the container starts
+
+CMD ["./occurrency_tracker"]

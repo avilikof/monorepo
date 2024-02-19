@@ -84,7 +84,10 @@ where
                     self.repo
                         .update(new_alert.get_alert_id().to_string(), alert_bytes);
                     debug!("resolved");
-                    self.repo.delete(new_alert.get_alert_id());
+                    self.repo.update(
+                        new_alert.get_alert_id().to_string(),
+                        new_alert.as_bytes().unwrap(),
+                    );
                 }
                 Err(err) => {
                     error!("failed to deserialize alert: {}", err)
