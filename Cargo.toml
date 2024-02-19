@@ -1,9 +1,10 @@
 [workspace]
 members = [
-"apps/rust/productivity_tool/occurrency_tracker"]
+"apps/rust/productivity_tool/occurrency_tracker", "libs/rust/event_entity" ]
 
 [workspace.dependencies]
 env_loader = {path = "libs/rust/env_loader"}
 kafka_driver = {path = "libs/rust/kafka_driver"}
 alert_entity = {path = "libs/rust/alert_entity"}
 repository = {path = "libs/rust/repository"}
+event_entity = {path = "libs/rust/event_entity"}

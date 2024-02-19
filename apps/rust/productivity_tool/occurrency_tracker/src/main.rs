@@ -1,8 +1,10 @@
-mod alert_handler;
+mod handlers;
+mod interfaces;
 
-use std::env;
+use std::{env, time};
 
-use crate::alert_handler::AlertHandler;
+use crate::handlers::alert_handler::AlertHandler;
+use crate::interfaces::repo_interface::RepoInterface;
 use alert_entity::AlertEntity;
 use env_loader::load::load;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient};
@@ -18,9 +20,18 @@ async fn main() {
 
     let config = set_kafka_config();
     let client = create_kafka_client(&config);
-    let mut repo = repository::InMem::default();
+    let ttl_as_string = env::var("TTL").unwrap();
+    let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
+    let mut new_repo = repository::InMemoryStorage::new(Some(ttl));
+    let mut n = 0;
     loop {
-        read_message(&client, &mut repo).await;
+        n += 1;
+        read_message(&client, &mut new_repo).await;
+        if n % 100 == 0 {
+            info!("number of docs in storage: {}", &new_repo.get_count());
+            // info!("list of all keys: {:?}", &new_repo.get_keys());
+            new_repo.cleanup();
+        }
     }
 }
 
@@ -36,31 +47,22 @@ fn create_kafka_client(config: &KafkaClientConfig) -> KafkaConsumerClient {
     KafkaConsumerClient::connect(config)
 }
 
-async fn read_message(client: &KafkaConsumerClient, repo: &mut repository::InMem) {
+async fn read_message<R>(client: &KafkaConsumerClient, repo: &mut R)
+where
+    R: RepoInterface,
+{
     client.subscribe(&["alerts"]);
     match client.get_message().await {
         None => {}
         Some(msg) => match AlertEntity::from_bytes(&msg) {
             Ok(alert) => {
                 let mut alert_handler = AlertHandler::init(&alert, repo);
-                info!("{:?}", alert);
                 alert_handler.occurrence_handling_flow();
-                // print_from_storage(repo, alert.get_alert_id())
             }
             Err(err) => {
                 info!("{:?}", err);
                 info!("{:?}", String::from_utf8(msg));
             }
         },
-    }
-}
-
-fn print_from_storage(repo: &repository::InMem, id: &str) {
-    match repo.get(id) {
-        None => {}
-        Some(m) => {
-            let alert = AlertEntity::from_bytes(&m);
-            println!("{:?}", alert)
-        }
     }
 }
