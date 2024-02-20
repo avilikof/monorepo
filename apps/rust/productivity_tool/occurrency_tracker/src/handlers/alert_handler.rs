@@ -67,7 +67,7 @@ where
     fn first_occurrence(&mut self) -> EventEntity {
         const DESCRIPTION: &str = "alert opened";
         let mut new_alert = self.received_alert.clone();
-        new_alert.set_occurrence_id();
+        new_alert.set_new_occurrence_id();
         let new_alert_bytes = new_alert.as_bytes().unwrap();
         self.repo
             .push(new_alert.get_alert_id().to_string(), new_alert_bytes);
@@ -82,13 +82,20 @@ where
     }
     fn existing_alert_firing(&mut self) -> EventEntity {
         match self.received_alert.get_state() {
-            AlertState::Firing => EventEntity::new(
-                &mut self.received_alert,
-                EventType::Event,
-                EventAction::Drop,
-                "alert refired",
-                self.service.as_str(),
-            ),
+            AlertState::Firing => {
+                let old_alert = self.get_existing_alert_from_repo();
+                match old_alert.get_occurrence_id() {
+                    None => {}
+                    Some(id) => self.received_alert.set_occurrence_id(id.to_string()),
+                }
+                EventEntity::new(
+                    &mut self.received_alert,
+                    EventType::Event,
+                    EventAction::Drop,
+                    "alert refired",
+                    self.service.as_str(),
+                )
+            }
             AlertState::Resolved => self.resolve(),
         }
     }
@@ -106,7 +113,7 @@ where
     }
     fn reopen(&mut self) -> EventEntity {
         const REOPEN: &str = "alert reopened";
-        self.received_alert.set_occurrence_id();
+        self.received_alert.set_new_occurrence_id();
         let new_alert = self.received_alert.clone().as_bytes().unwrap();
         self.repo
             .update(self.received_alert.get_alert_id().to_string(), new_alert);
@@ -174,6 +181,12 @@ where
                 Err(_) => None,
                 Ok(a) => Some(a),
             },
+        }
+    }
+    fn get_existing_alert_from_repo(&self) -> AlertEntity {
+        match self.repo.pull(self.received_alert.get_alert_id()) {
+            Some(alert) => AlertEntity::from_bytes(alert).unwrap(),
+            _ => panic!("something really wrong"),
         }
     }
 }
