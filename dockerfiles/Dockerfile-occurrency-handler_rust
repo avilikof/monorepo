@@ -3,8 +3,8 @@ FROM rust:latest as builder
 WORKDIR /monorepo
 
 # Copy the service1 source code and lib1 modules
-COPY ../apps/rust/productivity_tool/occurrency_tracker/Cargo.toml /monorepo/apps/rust/productivity_tool/occurrency_tracker/Cargo.lock
 COPY ../apps/rust/productivity_tool/occurrency_tracker /monorepo/apps/rust/productivity_tool/occurrency_tracker
+COPY ../apps/rust/productivity_tool/db_updater /monorepo/apps/rust/productivity_tool/db_updater
 COPY ../Cargo.toml .
 COPY ../Cargo.lock .
 COPY ../libs/rust ./libs/rust
