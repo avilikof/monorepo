@@ -3,11 +3,17 @@ use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::error::{KafkaError, KafkaResult};
 use rdkafka::message::{BorrowedMessage, Message};
+use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::util::Timeout;
 use rdkafka::{Offset, TopicPartitionList};
 use std::time::Duration;
 
 pub struct KafkaConsumerClient {
     consumer: StreamConsumer,
+}
+
+pub struct KafkaProducerClient {
+    producer: FutureProducer,
 }
 
 pub struct KafkaClientConfig {
@@ -115,6 +121,47 @@ impl KafkaConsumerClient {
     }
 }
 
+impl KafkaProducerClient {
+    pub fn new(cfg: &KafkaClientConfig) -> Self {
+        let producer: FutureProducer = ClientConfig::new()
+            .set("bootstrap.servers", &cfg.bootstrap_server)
+            .set("security.protocol", "SASL_SSL")
+            .set("sasl.mechanisms", "SCRAM-SHA-256")
+            .set("sasl.username", &cfg.user)
+            .set("sasl.password", &cfg.pass)
+            .set("ssl.ca.location", "/etc/ssl/certs")
+            // Additional producer-specific configurations can be set here
+            .create()
+            .expect("Producer creation error");
+
+        Self { producer }
+    }
+
+    pub async fn send_message(
+        &self,
+        topic: &str,
+        key: &str,
+        message: &[u8],
+    ) -> Result<(), KafkaError> {
+        let record = FutureRecord::to(topic)
+            .payload(message)
+            .key(key)
+            // You can add timestamp or headers if needed
+            ;
+
+        match self.producer.send(record, Timeout::Never).await {
+            Ok(_delivery) => {
+                debug!("Message sent successfully to topic {topic}");
+                Ok(())
+            }
+            Err(e) => {
+                error!("Failed to enqueue message: {}", e.0);
+                Err(e.0)
+            }
+        }
+    }
+}
+
 pub fn create_kafka_consumer(cfg: &KafkaClientConfig) -> KafkaResult<StreamConsumer> {
     let consumer: StreamConsumer = ClientConfig::new()
         .set("group.id", &cfg.group_id)
@@ -125,6 +172,7 @@ pub fn create_kafka_consumer(cfg: &KafkaClientConfig) -> KafkaResult<StreamConsu
         .set("sasl.mechanisms", "SCRAM-SHA-256")
         .set("sasl.username", &cfg.user)
         .set("sasl.password", &cfg.pass)
+        .set("ssl.ca.location", "/etc/ssl/certs")
         .create()?;
     Ok(consumer)
 }

@@ -1,4 +1,4 @@
-FROM arm64v8/rust:latest as builder
+FROM rust:latest as builder
 # Set working directory to the service1 directory
 WORKDIR /monorepo
 
@@ -20,18 +20,26 @@ RUN apt-get install -y musl-tools
 #RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && \
 #    RUST_LOG=debug cargo build --target x86_64-unknown-linux-musl --release
 
-RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && RUST_LOG=debug cargo build
-CMD ["/monorepo/apps/rust/productivity_tool/occurrency_tracker/target/debug/occurrency_tracker"]
+RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && RUST_LOG=debug cargo build --release
+#CMD ["/monorepo/target/release/occurrency_tracker"]
 
 # Create a minimal image for the final stage
-FROM arm64v8/debian:buster-slim as template-rust
+FROM debian:bookworm-slim as template-rust
 
 # Set working directory
-WORKDIR /app
+WORKDIR /monorepo
+
+
+RUN apt-get update -y
+RUN apt-get install -y libsasl2-dev
+RUN apt-get install -y openssl
+RUN apt-get install ca-certificates
+RUN apt-get clean
 
 
 # Copy the built binary from the builder stage
-COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrency_tracker/target/debug/occurrency_tracker .
+COPY --from=builder /monorepo/target/release/occurrency_tracker .
+COPY --from=builder /monorepo/.env .
 #COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrency_tracker/target/x86_64-unknown-linux-musl/release/occurrency_tracker .
 
 # Run the service when the container starts

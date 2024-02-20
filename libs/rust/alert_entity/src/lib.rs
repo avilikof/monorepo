@@ -70,7 +70,7 @@ impl AlertEntity {
     pub fn set_occurrence_id(&mut self) {
         match &self.occurrence_id {
             None => {
-                self.occurrence_id = Some(get_random_number(10).to_string());
+                self.occurrence_id = Some(get_random_number(99999999999999999).to_string());
             }
             Some(id) => {
                 error!("cannot set ID it already exists: '{}'", id)
@@ -147,7 +147,7 @@ fn get_random_state() -> AlertState {
     }
 }
 
-fn get_random_number(max_number: u16) -> u16 {
+fn get_random_number(max_number: u128) -> u128 {
     let mut rng = rand::thread_rng();
     rng.gen_range(1..=max_number)
 }

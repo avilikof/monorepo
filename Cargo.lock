@@ -453,6 +453,7 @@ dependencies = [
  "alert_entity",
  "env_loader",
  "env_logger",
+ "event_entity",
  "kafka_driver",
  "log",
  "repository",

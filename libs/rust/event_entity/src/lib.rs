@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EventEntity {
-    alert: Vec<u8>,
+    alert: AlertEntity,
     service: String,
     action: EventAction,
     event_type: EventType,
@@ -17,6 +17,7 @@ pub enum EventAction {
     Resolve,
     Update,
     Drop,
+    Failure,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum EventType {
@@ -33,7 +34,7 @@ impl EventEntity {
         service: &str,
     ) -> Self {
         Self {
-            alert: alert.as_bytes().unwrap(),
+            alert: alert.to_owned(),
             service: service.to_string(),
             event_type,
             action,
