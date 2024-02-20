@@ -67,11 +67,19 @@ impl AlertEntity {
             None => self.occurrence_id = id.to_owned(),
         }
     }
-    pub fn set_occurrence_id(&mut self) {
+    pub fn set_new_occurrence_id(&mut self) {
         match &self.occurrence_id {
             None => {
                 self.occurrence_id = Some(get_random_number(99999999999999999).to_string());
             }
+            Some(id) => {
+                error!("cannot set ID it already exists: '{}'", id)
+            }
+        }
+    }
+    pub fn set_occurrence_id(&mut self, id: String) {
+        match &self.occurrence_id {
+            None => self.occurrence_id = Some(id),
             Some(id) => {
                 error!("cannot set ID it already exists: '{}'", id)
             }
