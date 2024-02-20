@@ -129,7 +129,7 @@ impl KafkaProducerClient {
             .set("sasl.mechanisms", "SCRAM-SHA-256")
             .set("sasl.username", &cfg.user)
             .set("sasl.password", &cfg.pass)
-            // .set("ssl.ca.location", "/etc/ssl/certs")
+            .set("ssl.ca.location", "/etc/ssl/certs")
             // Additional producer-specific configurations can be set here
             .create()
             .expect("Producer creation error");
@@ -172,7 +172,7 @@ pub fn create_kafka_consumer(cfg: &KafkaClientConfig) -> KafkaResult<StreamConsu
         .set("sasl.mechanisms", "SCRAM-SHA-256")
         .set("sasl.username", &cfg.user)
         .set("sasl.password", &cfg.pass)
-        // .set("ssl.ca.location", "/etc/ssl/certs")
+        .set("ssl.ca.location", "/etc/ssl/certs")
         .create()?;
     Ok(consumer)
 }
