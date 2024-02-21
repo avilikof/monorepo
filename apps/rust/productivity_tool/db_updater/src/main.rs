@@ -39,7 +39,7 @@ async fn main() {
                 if let Ok(mut event) = EventEntity::from_bytes(&msg) {
                     // es_client.index("test", &event).await.expect("Do something")
                     es_client
-                        .index_as_byte("test", event.as_bytes().unwrap())
+                        .index("test", event.as_bytes().unwrap())
                         .await
                         .expect("something bad");
                 }
