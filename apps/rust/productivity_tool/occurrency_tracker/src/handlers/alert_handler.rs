@@ -86,7 +86,7 @@ where
                 let old_alert = self.get_existing_alert_from_repo();
                 match old_alert.get_occurrence_id() {
                     None => {}
-                    Some(id) => &self.received_alert.set_occurrence_id(id.to_string()),
+                    Some(id) => self.received_alert.set_occurrence_id(id.to_string()),
                 }
                 EventEntity::new(
                     &mut self.received_alert,
