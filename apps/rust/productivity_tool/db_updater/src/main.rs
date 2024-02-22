@@ -1,5 +1,4 @@
 use env_loader::load::load;
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json;
 

@@ -1,5 +1,6 @@
 .env
 .idea
 target
-/apps/go/productivity_tool/alert_generator/alert_generator
+./apps/go/productivity_tool/alert_generator/alert_generator
 *.iml
+./.idea/monorepo.iml
