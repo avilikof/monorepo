@@ -14,6 +14,7 @@ use log::{error, info};
 #[tokio::main]
 async fn main() {
     env_logger::init();
+    const SERVICE_NAME: &str = "occurrency_tracker";
     // Load path is - monorepo/libs/rust/env_loader
     if let Err(_err) = load(".env") {
         error!("failed to load .env values")

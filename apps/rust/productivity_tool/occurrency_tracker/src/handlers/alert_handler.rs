@@ -31,15 +31,14 @@ where
         }
     }
     fn new_occurrence(&mut self) -> EventEntity {
+        const DROP_DESCRIPTION: &str = "dropping new resolved alert";
         match self.received_alert.get_state() {
             AlertState::Firing => self.first_occurrence(),
             AlertState::Resolved => {
-                debug!("Dropped new occurrence state Resolved");
-                EventEntity::new(
+                debug!("{DROP_DESCRIPTION}");
+                event_action_drop(
                     &mut self.received_alert,
-                    EventType::Event,
-                    EventAction::Drop,
-                    "dropping new resolved alert",
+                    DROP_DESCRIPTION,
                     self.service.as_str(),
                 )
             }
@@ -71,7 +70,7 @@ where
         let new_alert_bytes = new_alert.as_bytes().unwrap();
         self.repo
             .push(new_alert.get_alert_id().to_string(), new_alert_bytes);
-        debug!("First occurrence");
+        debug!("{DESCRIPTION}");
         EventEntity::new(
             &mut new_alert,
             EventType::Event,
@@ -81,20 +80,21 @@ where
         )
     }
     fn existing_alert_firing(&mut self) -> EventEntity {
+        const ERROR_DESCRIPTION: &str =
+            "old alert has no `occurrence_id` but is expected to have one";
+        const REFIRING: &str = "alert refiring";
         match self.received_alert.get_state() {
             AlertState::Firing => {
-                let old_alert = self.get_existing_alert_from_repo();
+                let mut old_alert = self.get_existing_alert_from_repo();
                 match old_alert.get_occurrence_id() {
-                    None => {}
-                    Some(id) => self.received_alert.set_occurrence_id(id.to_string()),
+                    None => {
+                        event_type_log(&mut old_alert, ERROR_DESCRIPTION, self.service.as_str())
+                    }
+                    Some(id) => {
+                        self.received_alert.set_occurrence_id(id.to_string());
+                        event_action_drop(&mut self.received_alert, REFIRING, self.service.as_str())
+                    }
                 }
-                EventEntity::new(
-                    &mut self.received_alert,
-                    EventType::Event,
-                    EventAction::Drop,
-                    "alert refired",
-                    self.service.as_str(),
-                )
             }
             AlertState::Resolved => self.resolve(),
         }
@@ -102,12 +102,10 @@ where
     fn existing_alert_resolved(&mut self) -> EventEntity {
         match self.received_alert.get_state() {
             AlertState::Firing => self.reopen(),
-            AlertState::Resolved => EventEntity::new(
+            AlertState::Resolved => event_action_drop(
                 &mut self.received_alert,
-                EventType::Event,
-                EventAction::Drop,
                 "alert dropped id 1",
-                self.service.as_str(),
+                &self.service,
             ),
         }
     }
@@ -131,12 +129,9 @@ where
         match self.repo.pull(self.received_alert.get_alert_id()) {
             None => {
                 error!("{ERROR_ALERT_NOT_IN_REPO}");
-
-                EventEntity::new(
+                event_type_log(
                     &mut self.received_alert,
-                    EventType::Log,
-                    EventAction::Failure,
-                    ERROR_ALERT_NOT_IN_REPO,
+                    ERROR_DESERIALIZING,
                     self.service.as_str(),
                 )
             }
@@ -145,10 +140,8 @@ where
                 Err(err) => {
                     let err_message = format!("{}: {}", ERROR_DESERIALIZING, err);
                     error!("{}", err_message);
-                    EventEntity::new(
+                    event_type_log(
                         &mut self.received_alert,
-                        EventType::Log,
-                        EventAction::Failure,
                         err_message.as_str(),
                         self.service.as_str(),
                     )
@@ -187,4 +180,24 @@ where
             _ => panic!("something really wrong"),
         }
     }
+}
+
+fn event_action_drop(alert: &mut AlertEntity, description: &str, name: &str) -> EventEntity {
+    EventEntity::new(
+        alert,
+        EventType::Event,
+        EventAction::Drop,
+        description,
+        name,
+    )
+}
+
+fn event_type_log(alert: &mut AlertEntity, description: &str, name: &str) -> EventEntity {
+    EventEntity::new(
+        alert,
+        EventType::Log,
+        EventAction::Failure,
+        description,
+        name,
+    )
 }
