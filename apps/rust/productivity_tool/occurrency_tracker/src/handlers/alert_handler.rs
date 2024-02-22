@@ -140,22 +140,20 @@ where
                     self.service.as_str(),
                 )
             }
-            Some(b) => {
-                return match AlertEntity::from_bytes(b.as_slice()) {
-                    Ok(new_alert) => self.resolve_alert(new_alert),
-                    Err(err) => {
-                        let err_message = format!("{}: {}", ERROR_DESERIALIZING, err);
-                        error!("{}", err_message);
-                        EventEntity::new(
-                            &mut self.received_alert,
-                            EventType::Log,
-                            EventAction::Failure,
-                            err_message.as_str(),
-                            self.service.as_str(),
-                        )
-                    }
+            Some(b) => match AlertEntity::from_bytes(b.as_slice()) {
+                Ok(new_alert) => self.resolve_alert(new_alert),
+                Err(err) => {
+                    let err_message = format!("{}: {}", ERROR_DESERIALIZING, err);
+                    error!("{}", err_message);
+                    EventEntity::new(
+                        &mut self.received_alert,
+                        EventType::Log,
+                        EventAction::Failure,
+                        err_message.as_str(),
+                        self.service.as_str(),
+                    )
                 }
-            }
+            },
         }
     }
     fn resolve_alert(&mut self, mut new_alert: AlertEntity) -> EventEntity {

@@ -13,5 +13,5 @@ event_entity = {workspace = true}
 kafka_driver = { workspace = true}
 reqwest = { version = "0.11.24", features = ["json"] }
 tokio = {version = "1.36.0", features = ["full"]}
-serde = { version = "1.0.196", features = ["derive"] }
-serde_json = "1.0.113"
+serde = { workspace = true, features = ["derive"] }
+serde_json = {workspace = true}
