@@ -2,7 +2,7 @@
 [workspace]
 members = [
     "apps/rust/productivity_tool/db_updater",
-    "apps/rust/productivity_tool/occurrency_tracker",
+    "apps/rust/productivity_tool/occurrence_tracker",
     "libs/rust/env_loader",
     "libs/rust/kafka_driver",
     "libs/rust/alert_entity",

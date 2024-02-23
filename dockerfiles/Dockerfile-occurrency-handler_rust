@@ -3,7 +3,7 @@ FROM rust:latest as builder
 WORKDIR /monorepo
 
 # Copy the service1 source code and lib1 modules
-COPY ../apps/rust/productivity_tool/occurrency_tracker /monorepo/apps/rust/productivity_tool/occurrency_tracker
+COPY ../apps/rust/productivity_tool/occurrence_tracker /monorepo/apps/rust/productivity_tool/occurrency_tracker
 COPY ../apps/rust/productivity_tool/db_updater /monorepo/apps/rust/productivity_tool/db_updater
 COPY ../Cargo.toml .
 COPY ../Cargo.lock .
@@ -17,11 +17,11 @@ RUN apt-get install -y openssl
 RUN apt-get install -y musl-tools
 
 #RUN rustup target add x86_64-unknown-linux-musl
-#RUN cd /monorepo/apps/rust/productivity_tool/occurrency_tracker && \
+#RUN cd /monorepo/apps/rust/productivity_tool/occurrence_tracker && \
 #    RUST_LOG=debug cargo build --target x86_64-unknown-linux-musl --release
 
-RUN cargo build --release -p occurrency_tracker
-#CMD ["/monorepo/target/release/occurrency_tracker"]
+RUN cargo build --release -p occurrence_tracker
+#CMD ["/monorepo/target/release/occurrence_tracker"]
 
 # Create a minimal image for the final stage
 FROM debian:bookworm-slim as template-rust
@@ -40,7 +40,7 @@ RUN apt-get clean
 # Copy the built binary from the builder stage
 COPY --from=builder /monorepo/target/release/occurrency_tracker .
 COPY --from=builder /monorepo/.env .
-#COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrency_tracker/target/x86_64-unknown-linux-musl/release/occurrency_tracker .
+#COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrence_tracker/target/x86_64-unknown-linux-musl/release/occurrence_tracker .
 
 # Run the service when the container starts
 
