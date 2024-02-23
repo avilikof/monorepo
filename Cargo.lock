@@ -724,7 +724,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "occurrency_tracker"
+name = "occurrence_tracker"
 version = "0.1.0"
 dependencies = [
  "alert_entity",

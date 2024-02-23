@@ -1,0 +1,10 @@
+version: '3,8'
+services:
+  random-alert-generator:
+    build:
+      context: ../
+      dockerfile: Dockerfile-alert_generator_go
+  occurrence-handler:
+    build:
+      context: ../
+      dockerfile: Dockerfile-occurrence-handler-rust
