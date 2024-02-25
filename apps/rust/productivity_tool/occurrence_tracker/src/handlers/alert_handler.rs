@@ -1,6 +1,6 @@
 use crate::interfaces::repo_interface::RepoInterface;
 use alert_entity::{AlertEntity, AlertState};
-use event_entity::{EventAction, EventEntity, EventType};
+use event_entity::{EventEntity, EventType};
 use log::{debug, error};
 
 pub struct OccurrenceHandler<'a, R>
@@ -65,9 +65,8 @@ where
         const DESCRIPTION: &str = "alert opened";
         let mut new_alert = self.received_alert.clone();
         new_alert.set_new_occurrence_id();
-        let new_alert_bytes = new_alert.as_bytes().unwrap();
         self.repo
-            .push(new_alert.get_alert_id().to_string(), new_alert_bytes);
+            .push(new_alert.get_alert_id().to_string(), &mut new_alert);
         debug!("{DESCRIPTION}");
         EventEntity::open(&mut new_alert, DESCRIPTION, self.service.as_str())
     }
@@ -104,9 +103,10 @@ where
     fn reopen(&mut self) -> EventEntity {
         const REOPEN: &str = "alert reopened";
         self.received_alert.set_new_occurrence_id();
-        let new_alert = self.received_alert.clone().as_bytes().unwrap();
-        self.repo
-            .update(self.received_alert.get_alert_id().to_string(), new_alert);
+        self.repo.update(
+            self.received_alert.get_alert_id().to_string(),
+            self.received_alert.clone(),
+        );
         EventEntity::reopen(&mut self.received_alert, REOPEN, self.service.as_str())
     }
     fn resolve(&mut self) -> EventEntity {
@@ -121,42 +121,27 @@ where
                     self.service.as_str(),
                 )
             }
-            Some(b) => match AlertEntity::from_bytes(b.as_slice()) {
-                Ok(new_alert) => self.resolve_alert(new_alert),
-                Err(err) => {
-                    let err_message = format!("{}: {}", ERROR_DESERIALIZING, err);
-                    error!("{}", err_message);
-                    EventEntity::log(
-                        &mut self.received_alert,
-                        err_message.as_str(),
-                        self.service.as_str(),
-                    )
-                }
-            },
+            Some(alert) => self.resolve_alert(alert.to_owned()),
         }
     }
     fn resolve_alert(&mut self, mut new_alert: AlertEntity) -> EventEntity {
         const RESOLVED: &str = "alert resolved";
 
         new_alert.set_state(AlertState::Resolved);
-        let alert_bytes = new_alert.as_bytes().unwrap();
         self.repo
-            .update(new_alert.get_alert_id().to_string(), alert_bytes);
+            .update(new_alert.get_alert_id().to_string(), new_alert.clone());
         debug!("resolved");
         EventEntity::resolve(&mut new_alert, RESOLVED, self.service.as_str())
     }
     fn extract_alert_from_repo(&self) -> Option<AlertEntity> {
         match self.repo.pull(self.received_alert.get_alert_id()) {
             None => None,
-            Some(payload) => match AlertEntity::from_bytes(payload) {
-                Err(_) => None,
-                Ok(a) => Some(a),
-            },
+            Some(payload) => Some(payload.to_owned()),
         }
     }
     fn get_existing_alert_from_repo(&self) -> AlertEntity {
         match self.repo.pull(self.received_alert.get_alert_id()) {
-            Some(alert) => AlertEntity::from_bytes(alert).unwrap(),
+            Some(alert) => alert.to_owned(),
             _ => panic!("something really wrong"),
         }
     }
