@@ -3,7 +3,7 @@ mod interfaces;
 
 use std::{env, time};
 
-use crate::handlers::alert_handler::AlertHandler;
+use crate::handlers::alert_handler::OccurrenceHandler;
 use crate::interfaces::repo_interface::RepoInterface;
 use alert_entity::AlertEntity;
 use env_loader::load::load;
@@ -64,7 +64,7 @@ where
         None => todo!(),
         Some(msg) => match AlertEntity::from_bytes(&msg) {
             Ok(alert) => {
-                let mut alert_handler = AlertHandler::init(&alert, repo);
+                let mut alert_handler = OccurrenceHandler::init(&alert, repo);
                 alert_handler.occurrence_handling_flow()
             }
             Err(err) => {

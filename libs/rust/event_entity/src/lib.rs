@@ -41,6 +41,52 @@ impl EventEntity {
             description: description.to_string(),
         }
     }
+    pub fn open(alert: &mut AlertEntity, description: &str, service: &str) -> Self {
+        Self {
+            alert: alert.to_owned(),
+            service: service.to_owned(),
+            event_type: EventType::Event,
+            action: EventAction::Open,
+            description: description.to_owned(),
+        }
+    }
+    pub fn drop(alert: &mut AlertEntity, description: &str, service: &str) -> Self {
+        Self {
+            alert: alert.to_owned(),
+            service: service.to_owned(),
+            event_type: EventType::Event,
+            action: EventAction::Drop,
+            description: description.to_owned(),
+        }
+    }
+    pub fn log(alert: &mut AlertEntity, description: &str, service: &str) -> Self {
+        Self {
+            alert: alert.to_owned(),
+            service: service.to_owned(),
+            event_type: EventType::Log,
+            action: EventAction::Failure,
+            description: description.to_owned(),
+        }
+    }
+    pub fn reopen(alert: &mut AlertEntity, description: &str, service: &str) -> Self {
+        Self {
+            alert: alert.to_owned(),
+            service: service.to_owned(),
+            event_type: EventType::Event,
+            action: EventAction::Reopen,
+            description: description.to_owned(),
+        }
+    }
+    pub fn resolve(alert: &mut AlertEntity, description: &str, service: &str) -> Self {
+        Self {
+            alert: alert.to_owned(),
+            service: service.to_owned(),
+            event_type: EventType::Event,
+            action: EventAction::Resolve,
+            description: description.to_owned(),
+        }
+    }
+
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, serde_json::Error> {
         serde_json::from_slice(bytes)
     }
