@@ -54,9 +54,10 @@ func main() {
 }
 
 func produceRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *alert_entity.AlertEntity) error {
+	key := randomAlert.GetAlertId()
 	alertBytes, _err := randomAlert.ToByte()
 	if _err != nil {
 		return _err
 	}
-	return kafkaHandler.Push([]byte("alert"), alertBytes, "alerts")
+	return kafkaHandler.Push([]byte(key), alertBytes, "alerts")
 }
