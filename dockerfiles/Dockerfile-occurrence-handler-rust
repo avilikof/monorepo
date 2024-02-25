@@ -45,4 +45,4 @@ COPY --from=builder /monorepo/.env .
 # Run the service when the container starts
 
 ENV RUST_LOG=info
-CMD ["./occurrency_tracker"]
+CMD ["./occurrence_tracker"]
