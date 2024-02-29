@@ -3,16 +3,16 @@
 **Root Directory:**
 
 - `apps/`: Contains code for individual microservices, grouped by language or service domain.
-    - `go/`: Go microservices
-    - `python/`: Python microservices
-    - `node/`: Node.js microservices
-    - `.../`: Other language-specific directories as needed
+  - `go/`: Go microservices
+  - `python/`: Python microservices
+  - `node/`: Node.js microservices
+  - `.../`: Other language-specific directories as needed
 - `libs/`: Shared libraries and modules, organized by language or functionality.
-    - `common/`: Common code across languages (e.g., configuration, interfaces)
-    - `go/`: Go libraries
-    - `python/`: Python libraries
-    - `node/`: Node.js libraries
-    - `.../`: Other language-specific libraries
+  - `common/`: Common code across languages (e.g., configuration, interfaces)
+  - `go/`: Go libraries
+  - `python/`: Python libraries
+  - `node/`: Node.js libraries
+  - `.../`: Other language-specific libraries
 - `infrastructure/`: Infrastructure-related code (deployment scripts, CI/CD pipelines, Dockerfiles)
 - `scripts/`: Helper scripts for development and operations
 - `docs/`: Documentation for the project and its components
@@ -70,3 +70,10 @@ monorepo/
 
 This structure provides a solid foundation for organizing your monorepo with multiple languages and microservices, fostering maintainability, collaboration, and efficient development workflows.
 
+## How to add new go package example:
+
+```
+go mod init -C ./pkg/alpha github.com/mitchallen/go-monorepo-demo/pkg/alpha
+go work use -r .
+go mod tidy -C ./pkg/alpha/
+```
