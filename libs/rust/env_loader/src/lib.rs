@@ -1,6 +1,7 @@
-use log::{error, info};
 use std::path::Path;
 use std::{env, fs};
+
+use log::{error, info};
 
 /// Custom error type for environment loading operations.
 #[derive(Debug, PartialEq)]
@@ -11,8 +12,9 @@ pub enum EnvLoaderError {
 
 /// Module for environment loading functionality.
 pub mod load {
-    use crate::{file_exists, EnvLoaderError};
     use dotenv::from_filename;
+
+    use crate::{file_exists, EnvLoaderError};
 
     /// Loads environment variables from a specified .env file.
     ///
@@ -58,9 +60,13 @@ fn file_exists(path_str: &str) -> Result<(), EnvLoaderError> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::fs::File;
-    use tempfile::tempdir; // You might need to add the `tempfile` crate for this.
+
+    use tempfile::tempdir;
+
+    use super::*;
+
+    // You might need to add the `tempfile` crate for this.
 
     #[test]
     fn test_file_exists_positive() {
@@ -80,9 +86,11 @@ mod tests {
 
 #[cfg(test)]
 mod env_loader_tests {
-    use super::*;
-    use crate::load::load;
     use std::env;
+
+    use crate::load::load;
+
+    use super::*;
 
     #[test]
     fn test_load_env_file_exists() {

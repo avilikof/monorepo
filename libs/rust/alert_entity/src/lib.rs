@@ -1,9 +1,10 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use log::{error, warn};
 use rand::distributions::uniform::SampleBorrow;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use serde::{Deserialize, Deserializer, Serialize};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Serialize, Debug, Clone, Eq, PartialEq)]
 pub enum AlertState {

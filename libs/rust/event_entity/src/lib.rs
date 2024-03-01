@@ -1,5 +1,6 @@
-use alert_entity::AlertEntity;
 use serde::{Deserialize, Serialize};
+
+use alert_entity::AlertEntity;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EventEntity {

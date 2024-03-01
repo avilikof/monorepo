@@ -1,15 +1,17 @@
-use crate::interfaces::repo_interface::RepoInterface;
-use alert_entity::AlertEntity;
 use log::error;
+
+use alert_entity::AlertEntity;
 use repository::InMemoryStorage;
 
+use crate::interfaces::repo_interface::RepoInterface;
+
 impl RepoInterface for InMemoryStorage {
-    fn pull(&self, key: &str) -> Option<&AlertEntity> {
+    fn pull(&self, key: &str) -> Option<AlertEntity> {
         match self.search(key) {
             None => None,
-            Some(bytes) => match AlertEntity::from_bytes(bytes) {
+            Some(bytes) => match AlertEntity::from_bytes(&bytes) {
                 Err(_) => None,
-                Ok(alert) => Some(&alert),
+                Ok(alert) => Some(alert),
             },
         }
     }
@@ -21,7 +23,7 @@ impl RepoInterface for InMemoryStorage {
         }
     }
 
-    fn update(&mut self, key: String, mut value: AlertEntity) {
+    fn update(&mut self, key: String, mut value: &AlertEntity) {
         match value.as_bytes() {
             Ok(value_bytes) => self.update(key, value_bytes),
             _ => {}

@@ -60,8 +60,8 @@ impl InMemoryStorage {
         self.data.insert(key, (value, Instant::now()));
     }
 
-    pub fn search(&self, key: &str) -> Option<&Vec<u8>> {
-        self.data.get(key).map(|(value, _)| value)
+    pub fn search(&self, key: &str) -> Option<Vec<u8>> {
+        self.data.get(key).map(|(value, _)| value.to_owned())
     }
 
     pub fn update(&mut self, key: String, value: Vec<u8>) {

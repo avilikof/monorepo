@@ -1,15 +1,17 @@
-mod handlers;
-mod interfaces;
-
 use std::{env, time};
 
-use crate::handlers::alert_handler::OccurrenceHandler;
-use crate::interfaces::repo_interface::RepoInterface;
+use log::{error, info};
+
 use alert_entity::AlertEntity;
 use env_loader::load::load;
 use event_entity::EventEntity;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient, KafkaProducerClient};
-use log::{error, info};
+
+use crate::handlers::alert_handler::OccurrenceHandler;
+use crate::interfaces::repo_interface::RepoInterface;
+
+mod handlers;
+mod interfaces;
 
 #[tokio::main]
 async fn main() {
