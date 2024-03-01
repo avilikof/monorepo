@@ -1,10 +1,11 @@
 package tests
 
 import (
-	"github.com/avilikof/monorepo/lib/go/alert_entity"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/avilikof/monorepo/lib/go/alert_entity"
 )
 
 func TestNewAlertEntity(t *testing.T) {
@@ -15,7 +16,7 @@ func TestNewAlertEntity(t *testing.T) {
 }
 
 func TestRandomAlert(t *testing.T) {
-	alert := alert_entity.RandomAlert()
+	alert := alert_entity.RandomAlert(123456789)
 	if alert.GetDescription() != "random alert" {
 		t.Errorf("RandomAlert() failed, expected description 'random alert', got %s", alert.GetDescription())
 	}

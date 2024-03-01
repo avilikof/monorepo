@@ -4,12 +4,12 @@ use log::error;
 use repository::InMemoryStorage;
 
 impl RepoInterface for InMemoryStorage {
-    fn pull(&self, key: &str) -> Option<&AlertEntity> {
+    fn pull(&self, key: &str) -> Option<AlertEntity> {
         match self.search(key) {
             None => None,
             Some(bytes) => match AlertEntity::from_bytes(bytes) {
                 Err(_) => None,
-                Ok(alert) => Some(&alert),
+                Ok(alert) => Some(alert),
             },
         }
     }

@@ -1,5 +1,5 @@
 use reqwest::{Client, Error, Response};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::Value;
 
 pub struct ElasticClient {

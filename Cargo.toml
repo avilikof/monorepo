@@ -1,27 +1,28 @@
 
 [workspace]
 members = [
-    "apps/rust/productivity_tool/db_updater",
+    # "apps/rust/productivity_tool/db_updater",
     "apps/rust/productivity_tool/occurrence_tracker",
-    "libs/rust/env_loader",
-    "libs/rust/kafka_driver",
+    # "libs/rust/env_loader",
+    # "libs/rust/kafka_driver",
     "libs/rust/alert_entity",
-    "libs/rust/repository",
+    # "libs/rust/repository",
     "libs/rust/event_entity",
-    "libs/rust/es-driver",
+    # "libs/rust/es-driver",
+    # "apps/rust/one-bln-challange",
 ]
 
 resolver = "2"
 
 [workspace.dependencies]
- env_loader = { path = "libs/rust/env_loader" }
- kafka_driver = { path = "libs/rust/kafka_driver" }
- alert_entity = { path = "libs/rust/alert_entity" }
- repository = { path = "libs/rust/repository" }
- event_entity = { path = "libs/rust/event_entity" }
- es-driver = { path = "libs/rust/es-driver" }
+env_loader = { path = "libs/rust/env_loader" }
+kafka_driver = { path = "libs/rust/kafka_driver" }
+alert_entity = { path = "libs/rust/alert_entity" }
+repository = { path = "libs/rust/repository" }
+event_entity = { path = "libs/rust/event_entity" }
+es-driver = { path = "libs/rust/es-driver" }
 serde = "1.0.197"
 log = "0.4.20"
 serde_json = "1.0.114"
-rdkafka = { version = "0.36.2"}
+rdkafka = { version = "0.36.2" }
 env_logger = "0.11.2"

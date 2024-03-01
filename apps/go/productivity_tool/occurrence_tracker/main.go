@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/avilikof/monorepo/lib/go/alert_entity"
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/avilikof/monorepo/lib/go/kafka_driver"
-	"log"
-	"os"
 )
 
 func main() {

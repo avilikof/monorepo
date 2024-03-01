@@ -1,6 +1,6 @@
 use crate::interfaces::repo_interface::RepoInterface;
 use alert_entity::{AlertEntity, AlertState};
-use event_entity::{EventEntity, EventType};
+use event_entity::EventEntity;
 use log::{debug, error};
 
 pub struct OccurrenceHandler<'a, R>
