@@ -29,7 +29,7 @@ impl AlertEntity {
             timestamp: get_time_epoch_nano(),
             description: "random alert".to_string(),
             state: get_random_state(),
-            alert_id: get_random_number(10).to_string(),
+            alert_id: get_random_number(1000).to_string(),
         }
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, serde_json::Error> {
