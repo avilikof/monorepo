@@ -1,7 +1,9 @@
-use crate::interfaces::repo_interface::RepoInterface;
-use alert_entity::{AlertEntity, AlertState};
-use event_entity::{EventEntity, EventType};
 use log::{debug, error};
+
+use alert_entity::{AlertEntity, AlertState};
+use event_entity::EventEntity;
+
+use crate::interfaces::repo_interface::RepoInterface;
 
 pub struct OccurrenceHandler<'a, R>
 where
@@ -105,7 +107,7 @@ where
         self.received_alert.set_new_occurrence_id();
         self.repo.update(
             self.received_alert.get_alert_id().to_string(),
-            self.received_alert.clone(),
+            &mut self.received_alert,
         );
         EventEntity::reopen(&mut self.received_alert, REOPEN, self.service.as_str())
     }
@@ -129,7 +131,7 @@ where
 
         new_alert.set_state(AlertState::Resolved);
         self.repo
-            .update(new_alert.get_alert_id().to_string(), new_alert.clone());
+            .update(new_alert.get_alert_id().to_string(), &mut new_alert);
         debug!("resolved");
         EventEntity::resolve(&mut new_alert, RESOLVED, self.service.as_str())
     }

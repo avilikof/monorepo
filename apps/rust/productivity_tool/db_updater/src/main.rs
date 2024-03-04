@@ -1,11 +1,12 @@
-use env_loader::load::load;
-use serde::{Deserialize, Serialize};
+use std::env;
+
+use serde::Deserialize;
 use serde_json;
 
+use env_loader::load::load;
 use es_driver::ElasticClient;
 use event_entity::EventEntity;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient};
-use std::env;
 
 #[derive(Deserialize, Debug)]
 struct SearchResult<T> {

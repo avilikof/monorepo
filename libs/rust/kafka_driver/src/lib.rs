@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use log::{debug, error, info};
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
@@ -6,7 +8,6 @@ use rdkafka::message::{BorrowedMessage, Message};
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 use rdkafka::{Offset, TopicPartitionList};
-use std::time::Duration;
 
 pub struct KafkaConsumerClient {
     consumer: StreamConsumer,

@@ -3,12 +3,19 @@
   <component name="Go" enabled="true" />
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/occurrency_tracker/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/rust/env_loader/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/rust/kafka_driver/src" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/occurrency_tracker/target" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/alert_entity/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/es-driver/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/event_entity/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/repository/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/db_updater/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/occurrence_tracker/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/env_loader/target" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/kafka_driver/target" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/occurrence_tracker/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
