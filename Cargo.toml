@@ -1,0 +1,6 @@
+[workspace]
+
+
+resolver = "2"
+members = [ "apps/rust/productivity_tool/alert_generator",
+    "apps/rust/productivity_tool/occurrence_tracker"]
