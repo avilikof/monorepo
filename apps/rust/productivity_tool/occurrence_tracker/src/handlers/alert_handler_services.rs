@@ -17,16 +17,14 @@ impl RepoInterface for InMemoryStorage {
     }
 
     fn push(&mut self, key: String, value: &mut AlertEntity) {
-        match value.as_bytes() {
-            Ok(value_bytes) => self.store(key, value_bytes),
-            _ => {}
+        if let Ok(value_bytes) = value.as_bytes() {
+            self.store(key, value_bytes)
         }
     }
 
-    fn update(&mut self, key: String, mut value: &AlertEntity) {
-        match value.as_bytes() {
-            Ok(value_bytes) => self.update(key, value_bytes),
-            _ => {}
+    fn update(&mut self, key: String, value: &mut AlertEntity) {
+        if let Ok(value_bytes) = value.as_bytes() {
+            self.update(key, value_bytes)
         }
     }
 

@@ -107,7 +107,7 @@ where
         self.received_alert.set_new_occurrence_id();
         self.repo.update(
             self.received_alert.get_alert_id().to_string(),
-            &self.received_alert,
+            &mut self.received_alert,
         );
         EventEntity::reopen(&mut self.received_alert, REOPEN, self.service.as_str())
     }
@@ -131,7 +131,7 @@ where
 
         new_alert.set_state(AlertState::Resolved);
         self.repo
-            .update(new_alert.get_alert_id().to_string(), &new_alert);
+            .update(new_alert.get_alert_id().to_string(), &mut new_alert);
         debug!("resolved");
         EventEntity::resolve(&mut new_alert, RESOLVED, self.service.as_str())
     }

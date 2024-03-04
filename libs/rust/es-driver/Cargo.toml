@@ -3,11 +3,14 @@ name = "es-driver"
 version = "0.1.0"
 edition = "2021"
 
+resolver = "2"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-event_entity = { workspace = true }
-alert_entity = { workspace = true }
+#event_entity = { workspace = true }
+#alert_entity = { workspace = true }
 serde_json = "1.0.113"
 reqwest = { version = "0.11.24", features = ["json"] }
 serde = { version = "1.0.196", features = ["derive"] }
+event_entity = { path = "../event_entity" }
+alert_entity = { path = "../alert_entity" }

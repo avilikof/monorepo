@@ -6,6 +6,7 @@ use alert_entity::AlertEntity;
 use env_loader::load::load;
 use event_entity::EventEntity;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient, KafkaProducerClient};
+use repository::InMemoryStorage;
 
 use crate::handlers::alert_handler::OccurrenceHandler;
 use crate::interfaces::repo_interface::RepoInterface;
@@ -26,7 +27,7 @@ async fn main() {
     let producer = create_kafka_producer(&config);
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
-    let mut new_repo = repository::InMemoryStorage::new(Some(ttl));
+    let mut new_repo = InMemoryStorage::new(Some(ttl));
     let mut n = 0;
     loop {
         n += 1;

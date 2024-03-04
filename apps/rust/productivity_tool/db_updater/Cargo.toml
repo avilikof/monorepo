@@ -6,12 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-es-driver = {workspace = true}
-env_loader = {workspace = true}
-alert_entity = {workspace = true}
-event_entity = {workspace = true}
-kafka_driver = { workspace = true}
+#es-driver = {workspace = true}
+#env_loader = {workspace = true}
+#alert_entity = {workspace = true}
+#event_entity = {workspace = true}
+#kafka_driver = { workspace = true}
 reqwest = { version = "0.11.24", features = ["json"] }
-tokio = {version = "1.36.0", features = ["full"]}
-serde = { workspace = true, features = ["derive"] }
-serde_json = {workspace = true}
+tokio = { version = "1.36.0", features = ["full"] }
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = { version = "1.0.114" }
+env_loader = { path = "../../../../libs/rust/env_loader" }
+kafka_driver = { path = "../../../../libs/rust/kafka_driver" }
+alert_entity = { path = "../../../../libs/rust/alert_entity" }
+repository = { path = "../../../../libs/rust/repository" }
+event_entity = { path = "../../../../libs/rust/event_entity" }
+es-driver = { path = "../../../../libs/rust/es-driver" }
