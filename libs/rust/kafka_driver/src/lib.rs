@@ -130,7 +130,7 @@ impl KafkaProducerClient {
             .set("sasl.mechanisms", "SCRAM-SHA-256")
             .set("sasl.username", &cfg.user)
             .set("sasl.password", &cfg.pass)
-            .set("max.request.size", "10")
+            .set("request.required.acks	", "0")
             .set("ssl.ca.location", "/etc/ssl/certs")
             // Additional producer-specific configurations can be set here
             .create()
