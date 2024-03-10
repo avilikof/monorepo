@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/avilikof/monorepo/lib/go/alert_entity"
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/avilikof/monorepo/lib/go/kafka_driver"
-	"log"
-	"os"
 )
 
 func main() {
@@ -15,25 +16,25 @@ func main() {
 }
 
 func readAlerts() {
-	envVars, _err := env_var.NewEnvVarHandler()
-	if _err != nil {
-		log.Println(_err)
+	envVars, err := env_var.NewEnvVarHandler()
+	if err != nil {
+		log.Println(err)
 	}
-	_err = envVars.LoadDotEnv(".env")
-	if _err != nil {
-		log.Printf("failed to load config: %v\n", _err)
+	err = envVars.LoadDotEnv(".env")
+	if err != nil {
+		log.Printf("failed to load config: %v\n", err)
 		os.Exit(0)
 	}
 	kafkaClient := kafka_driver.NewKafkaHandler(&envVars)
 	occHandler := NewOccurrenceHandler()
-	_err = kafkaClient.Subscribe(&envVars)
-	if _err != nil {
-		log.Println(_err)
+	err = kafkaClient.Subscribe(&envVars)
+	if err != nil {
+		log.Println(err)
 		os.Exit(0)
 	}
 	for {
-		_err := printMessage(&kafkaClient, &occHandler)
-		if _err != nil {
+		err := printMessage(&kafkaClient, &occHandler)
+		if err != nil {
 			continue
 		}
 	}
