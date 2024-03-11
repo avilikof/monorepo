@@ -5,7 +5,6 @@ WORKDIR /monorepo
 # Copy the service1 source code and lib1 modules
 COPY ../apps/rust /monorepo/apps/rust
 COPY ../Cargo.toml .
-COPY ../Cargo.lock .
 COPY ../libs/rust ./libs/rust
 COPY ../.env .
 
