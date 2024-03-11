@@ -1,11 +1,9 @@
 use alert_entity::AlertEntity;
 use bytes::Bytes;
 use env_loader::load::load;
-use futures::StreamExt;
 use kafka_driver::{KafkaClientConfig, KafkaProducerClient};
 use log::{error, info};
 use std::env;
-use std::str::from_utf8;
 use tokio::time;
 
 #[tokio::main]
@@ -39,32 +37,14 @@ async fn main() {
                 .publish("greet.joe", Bytes::from(alert_bytes.to_owned()))
                 .await
                 .expect("Failure for NATS");
-            if n % 1000 == 0 {
+            if n % 10 == 0 {
                 info!("{n}");
                 println!("{:?}", time::Instant::now() - start_time);
-                // time::sleep(Duration::from_secs(5)).await;
                 start_time = time::Instant::now();
             }
-            time::sleep(time::Duration::from_micros(10)).await;
+            time::sleep(time::Duration::from_secs(1)).await;
         }
     });
-    let reader = tokio::spawn(async {
-        let nats_url = env::var("NATS_URL").unwrap();
-
-        let client = async_nats::connect(nats_url).await.unwrap();
-
-        let mut subscription = client.subscribe("greet.*").await.unwrap();
-        while let Some(message) = subscription.next().await {
-            println!(
-                "{:?} received on {:?}",
-                from_utf8(&message.payload),
-                &message.subject
-            );
-        }
-        println!("Done");
-    });
-    // time::sleep(time::Duration::from_secs(15)).await;
-    reader.await.unwrap();
     producer.await.unwrap();
 }
 
