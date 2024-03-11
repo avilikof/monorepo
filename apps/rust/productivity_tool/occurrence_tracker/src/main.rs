@@ -26,7 +26,7 @@ async fn main() {
     let config = set_kafka_config();
     let kafka_stream_client = create_kafka_client(&config);
     let nats_stream_client = set_nats_client().await;
-    let producer = create_kafka_producer(&config);
+    let kafka_producer = create_kafka_producer(&config);
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
     let mut new_repo = InMemoryStorage::new(Some(ttl));
@@ -34,7 +34,7 @@ async fn main() {
     loop {
         n += 1;
         let mut event = read_message(&kafka_stream_client, &mut new_repo).await;
-        producer
+        kafka_producer
             .send_message("event", "event", event.as_bytes().unwrap().as_slice())
             .await
             .expect("TODO: panic message");
@@ -44,7 +44,6 @@ async fn main() {
             .unwrap();
         if n % 100 == 0 {
             info!("number of docs in storage: {}", &new_repo.get_count());
-            // new_repo.cleanup();
         }
     }
 }
