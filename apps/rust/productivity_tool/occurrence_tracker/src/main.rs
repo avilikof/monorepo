@@ -6,6 +6,7 @@ use alert_entity::AlertEntity;
 use env_loader::load::load;
 use event_entity::EventEntity;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient, KafkaProducerClient};
+use nats_driver::NatsStreamClient;
 use repository::InMemoryStorage;
 
 use crate::handlers::alert_handler::OccurrenceHandler;
@@ -23,7 +24,8 @@ async fn main() {
     }
 
     let config = set_kafka_config();
-    let client = create_kafka_client(&config);
+    let kafka_stream_client = create_kafka_client(&config);
+    let nats_stream_client = set_nats_client().await;
     let producer = create_kafka_producer(&config);
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
@@ -31,11 +33,15 @@ async fn main() {
     let mut n = 0;
     loop {
         n += 1;
-        let mut event = read_message(&client, &mut new_repo).await;
+        let mut event = read_message(&kafka_stream_client, &mut new_repo).await;
         producer
             .send_message("event", "event", event.as_bytes().unwrap().as_slice())
             .await
             .expect("TODO: panic message");
+        nats_stream_client
+            .publish("events", bytes::Bytes::from(event.as_bytes().unwrap()))
+            .await
+            .unwrap();
         if n % 100 == 0 {
             info!("number of docs in storage: {}", &new_repo.get_count());
             // new_repo.cleanup();
@@ -51,6 +57,10 @@ fn set_kafka_config() -> KafkaClientConfig {
     KafkaClientConfig::new(bootstrap, user, pass, group_id)
 }
 
+async fn set_nats_client() -> NatsStreamClient {
+    let nats_url = env::var("NATS_URL").unwrap();
+    NatsStreamClient::new(&nats_url).await
+}
 fn create_kafka_client(config: &KafkaClientConfig) -> KafkaConsumerClient {
     KafkaConsumerClient::connect(config)
 }
