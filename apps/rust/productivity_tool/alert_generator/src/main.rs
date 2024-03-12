@@ -34,7 +34,7 @@ async fn main() {
             let alert_bytes = random_alert.as_bytes().unwrap();
             kafka_produce(&alert_bytes, &kafka_producer).await;
             nats_client
-                .publish("greet.joe", Bytes::from(alert_bytes.to_owned()))
+                .publish("alerts", Bytes::from(alert_bytes.to_owned()))
                 .await
                 .expect("Failure for NATS");
             if n % 10 == 0 {
@@ -42,7 +42,7 @@ async fn main() {
                 println!("{:?}", time::Instant::now() - start_time);
                 start_time = time::Instant::now();
             }
-            time::sleep(time::Duration::from_secs(1)).await;
+            time::sleep(time::Duration::from_millis(100)).await;
         }
     });
     producer.await.unwrap();
