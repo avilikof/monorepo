@@ -117,8 +117,8 @@ impl NatsStreamClient {
     ///     Err(e) => println!("Error: {:?}", e),
     /// }
     /// ```
-    pub fn get_subscriber(&self) -> Result<&Subscriber, NatsDriverError> {
-        match &self.subscription {
+    pub fn get_subscriber(&mut self) -> Result<&mut Subscriber, NatsDriverError> {
+        match &mut self.subscription {
             None => Err(NatsDriverError::NoSubscriber),
             Some(subscriber) => Ok(subscriber),
         }
