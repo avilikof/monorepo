@@ -13,12 +13,12 @@ async fn main() {
         Ok(_) => {}
         Err(err) => error!("{err:?}"),
     }
-    let kafka_producer = KafkaProducerClient::new(&KafkaClientConfig::new(
-        env::var("KAFKA_URL").unwrap(),
-        env::var("KAFKA_USER").unwrap(),
-        env::var("KAFKA_PASS").unwrap(),
-        env::var("GROUP_ID").unwrap(),
-    ));
+    // let kafka_producer = KafkaProducerClient::new(&KafkaClientConfig::new(
+    //     env::var("KAFKA_URL").unwrap(),
+    //     env::var("KAFKA_USER").unwrap(),
+    //     env::var("KAFKA_PASS").unwrap(),
+    //     env::var("GROUP_ID").unwrap(),
+    // ));
 
     let nats_url =
         env::var("NATS_URL").unwrap_or_else(|_| "nats://192.168.32.163:4222".to_string());
@@ -27,12 +27,12 @@ async fn main() {
 
     let mut n = 0;
     let mut start_time = time::Instant::now();
-    let producer = tokio::spawn(async move {
+    let producer_kafka = tokio::spawn(async move {
         loop {
             n += 1;
             let mut random_alert = AlertEntity::random();
             let alert_bytes = random_alert.as_bytes().unwrap();
-            kafka_produce(&alert_bytes, &kafka_producer).await;
+            // kafka_produce(&alert_bytes, &kafka_producer).await;
             nats_client
                 .publish("alerts", Bytes::from(alert_bytes.to_owned()))
                 .await
@@ -45,7 +45,7 @@ async fn main() {
             time::sleep(time::Duration::from_millis(100)).await;
         }
     });
-    producer.await.unwrap();
+    producer_kafka.await.unwrap();
 }
 
 async fn kafka_produce(message: &[u8], producer: &KafkaProducerClient) {
