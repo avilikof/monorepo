@@ -43,6 +43,7 @@ impl Default for InMem {
     }
 }
 
+#[derive(Clone)]
 pub struct InMemoryStorage {
     data: HashMap<String, (Vec<u8>, Instant)>, // Data stored with timestamp
     ttl: Option<Duration>,                     // Optional time-to-live

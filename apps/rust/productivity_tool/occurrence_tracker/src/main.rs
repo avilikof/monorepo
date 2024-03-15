@@ -25,42 +25,34 @@ async fn main() {
     if let Err(_err) = load(".env") {
         error!("failed to load .env values")
     }
+    
 
-    let config = set_kafka_config();
-    let kafka_stream_client = create_kafka_client(&config);
     let mut nats_stream_sub_client = set_nats_client().await;
     let nats_stream_pub_client = set_nats_client().await;
     nats_stream_sub_client.subscribe("alerts").await.unwrap();
     let nats_subscription = nats_stream_sub_client.get_subscriber().unwrap();
-    let kafka_producer = create_kafka_producer(&config);
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
     let mut new_repo = InMemoryStorage::new(Some(ttl));
+    let mut second_repo = new_repo.clone();
+    let kafka_thread = tokio::spawn(async move {
+        start_kafka_client(&mut new_repo).await; 
+    });
     let mut n = 0;
     while let Some(message) = &nats_subscription.next().await {
+        n += 1;
         let alert = AlertEntity::from_bytes(&message.payload).unwrap();
-        let mut alert_handler = OccurrenceHandler::init(&alert, &mut new_repo);
+        let mut alert_handler = OccurrenceHandler::init(&alert, &mut second_repo);
         let mut event = alert_handler.occurrence_handling_flow();
         nats_stream_pub_client
             .publish("events", bytes::Bytes::from(event.as_bytes().unwrap()))
             .await
             .unwrap();
         if n % 100 == 0 {
-            info!("number of docs in storage: {}", &new_repo.get_count());
+            info!("number of docs in storage: {}", &second_repo.get_count());
         }
     }
-    loop {
-        n += 1;
-        let mut event = read_message(&kafka_stream_client, &mut new_repo).await;
-
-        kafka_producer
-            .send_message("event", "event", event.as_bytes().unwrap().as_slice())
-            .await
-            .expect("TODO: panic message");
-        if n % 100 == 0 {
-            info!("number of docs in storage: {}", &new_repo.get_count());
-        }
-    }
+    kafka_thread.await.unwrap();
 }
 
 fn set_kafka_config() -> KafkaClientConfig {
@@ -69,6 +61,28 @@ fn set_kafka_config() -> KafkaClientConfig {
     let pass = env::var("KAFKA_PASS").unwrap();
     let group_id = env::var("GROUP_ID").unwrap();
     KafkaClientConfig::new(bootstrap, user, pass, group_id)
+}
+
+async fn start_kafka_client(repo: &mut InMemoryStorage) {
+    let config = set_kafka_config();
+    let kafka_stream_client = create_kafka_client(&config);
+    let kafka_producer = create_kafka_producer(&config);
+    read_from_kafka(&kafka_stream_client, &kafka_producer, repo).await
+}
+async fn read_from_kafka(kafka_stream_client: &KafkaConsumerClient, kafka_producer: &KafkaProducerClient, repo: &mut InMemoryStorage) {
+    let mut n = 0;
+    loop {
+        n += 1;
+        let mut event = read_message(kafka_stream_client, repo).await;
+    
+        kafka_producer
+            .send_message("event", "event", event.as_bytes().unwrap().as_slice())
+            .await
+            .expect("TODO: panic message");
+        if n % 100 == 0 {
+            info!("number of docs in storage: {}", &repo.get_count());
+        }
+    }
 }
 
 async fn set_nats_client() -> NatsStreamClient {
