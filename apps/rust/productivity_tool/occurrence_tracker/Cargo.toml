@@ -6,13 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 #resolver = "2"
 [dependencies]
-#env_loader = { workspace = true }
-#kafka_driver = { workspace = true }
-#alert_entity = { workspace = true }
-#event_entity = { workspace = true }
-#repository = { workspace = true }
-#es-driver = { workspace = true }
-#log = { workspace = true }
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
 env_loader = { path = "../../../../libs/rust/env_loader" }
 kafka_driver = { path = "../../../../libs/rust/kafka_driver" }
@@ -24,3 +17,5 @@ nats_driver = { path = "../../../../libs/rust/nats_driver" }
 log = "0.4.21"
 env_logger = "0.11.2"
 bytes = "1.5.0"
+futures = "0.3.30"
+futures-util = "0.3.30"
