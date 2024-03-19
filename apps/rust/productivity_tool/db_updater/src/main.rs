@@ -37,7 +37,6 @@ async fn main() {
             None => {}
             Some(msg) => {
                 if let Ok(mut event) = EventEntity::from_bytes(&msg) {
-                    // es_client.index("test", &event).await.expect("Do something")
                     es_client
                         .index("test", event.as_bytes().unwrap())
                         .await
@@ -59,3 +58,6 @@ fn get_kafka_config() -> KafkaClientConfig {
 fn create_kafka_client(config: &KafkaClientConfig) -> KafkaConsumerClient {
     KafkaConsumerClient::connect(config)
 }
+
+
+    

@@ -1,4 +1,8 @@
-use async_nats::{Client, ConnectError, PublishError, SubscribeError, Subscriber};
+use async_nats::{Client, ConnectError, PublishError, SubscribeError, Subscriber, jetstream};
+use async_nats::jetstream::Context;
+use async_nats::jetstream::context::CreateKeyValueError;
+use async_nats::jetstream::kv::Store;
+use async_nats::rustls::internal::msgs::enums::Compression::Deflate;
 use bytes::Bytes;
 
 /// Errors that might occur while using the `NatsClient`.
@@ -12,6 +16,7 @@ pub enum NatsDriverError {
     /// Wraps errors related to establishing a connection with the NATS server.
     ConnectionError(ConnectError),
     FailedToPublish(PublishError),
+    FailedCreateJSBucket(CreateKeyValueError)
 }
 
 /// A client for interacting with NATS, supporting asynchronous connection and subscription.
@@ -21,6 +26,11 @@ pub struct NatsStreamClient {
     client: Client,
     /// An optional subscriber, available after a successful subscription.
     subscription: Option<Subscriber>,
+}
+
+pub struct NatsJetStreamClient {
+    client: Client,
+    js_storage: Option<Store> 
 }
 
 impl NatsStreamClient {
@@ -122,5 +132,33 @@ impl NatsStreamClient {
             None => Err(NatsDriverError::NoSubscriber),
             Some(subscriber) => Ok(subscriber),
         }
+    }
+}
+
+impl NatsJetStreamClient {
+    pub async fn new(url: &str) -> Self {
+        Self {
+            client: async_nats::connect(url).await.unwrap(),
+            js_storage: None
+        }
+    }
+
+    pub async fn create_kv_storage(&mut self, bucket_name: &str) -> Result<(), NatsDriverError> {
+        let jstream = jetstream::new(self.client.clone());
+        match jstream.create_key_value(jetstream::kv::Config{
+            bucket: bucket_name.to_owned(),
+            ..Default::default()
+        }).await {
+            Ok(store) => {
+                self.js_storage = Option::from(store);
+                Ok(())
+            }
+            Err(err) => {
+               Err(NatsDriverError::FailedCreateJSBucket(err)) 
+            }
+        }
+    }
+    pub fn get_kv(&mut self) -> Option<&Store> {
+        self.js_storage.as_ref()
     }
 }

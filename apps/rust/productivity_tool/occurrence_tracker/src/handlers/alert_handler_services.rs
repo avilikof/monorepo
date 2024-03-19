@@ -1,6 +1,7 @@
 use log::error;
 
 use alert_entity::AlertEntity;
+use nats_driver::NatsJetStreamClient;
 use repository::InMemoryStorage;
 
 use crate::interfaces::repo_interface::RepoInterface;
@@ -40,4 +41,8 @@ impl RepoInterface for InMemoryStorage {
             },
         }
     }
+}
+
+impl RepoInterface for NatsJetStreamClient {
+    
 }
