@@ -5,6 +5,6 @@ resolver = "2"
 members = [
     "apps/rust/productivity_tool/alert_generator",
     "apps/rust/productivity_tool/occurrence_tracker",
-    "apps/rust/productivity_tool/db_updater", "libs/rust/nats_driver", "apps/rust/nats_client",
+    "apps/rust/productivity_tool/db_updater", "libs/rust/nats_driver", "apps/rust/nats_client", "libs/rust/nats_driver_v2",
 ]
 

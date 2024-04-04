@@ -11,6 +11,11 @@
       <sourceFolder url="file://$MODULE_DIR$/libs/rust/repository/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/db_updater/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/occurrence_tracker/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/productivity_tool/alert_generator/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/nats-driver/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/nats_driver/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/nats_client/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/rust/nats_driver_v2/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/env_loader/target" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/kafka_driver/target" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />

@@ -6,14 +6,13 @@ use alert_entity::AlertEntity;
 use env_loader::load::load;
 use event_entity::EventEntity;
 use kafka_driver::{KafkaClientConfig, KafkaConsumerClient, KafkaProducerClient};
-use nats_driver::{NatsJetStreamClient, NatsStreamClient};
 use repository::InMemoryStorage;
 
 use crate::handlers::alert_handler::OccurrenceHandler;
 use crate::interfaces::repo_interface::RepoInterface;
 
-use futures_util::stream::StreamExt; // Add this line to bring StreamExt into scope
-
+use futures_util::stream::StreamExt;
+use nats_driver_v2::NatsDriver; // Add this line to bring StreamExt into scope
 
 mod handlers;
 mod interfaces;
@@ -26,35 +25,36 @@ async fn main() {
         error!("failed to load .env values")
     }
 
+    let mut nats_client = set_nats_client().await;
+    let mut nats_subscriber = nats_client.get_subscriber("alerts").await.unwrap();
 
-    let mut nats_stream_sub_client = set_nats_client().await;
-    let nats_stream_pub_client = set_nats_client().await;
-    let mut nats_kv_client = set_nats_store().await;
-    nats_stream_sub_client.subscribe("alerts").await.unwrap();
-    let nats_subscription = nats_stream_sub_client.get_subscriber().unwrap();
+    // let mut nats_stream_sub_client = set_nats_client().await;
+    // let nats_stream_pub_client = set_nats_client().await;
+    // let mut nats_kv_client = set_nats_store().await;
+    // nats_stream_sub_client.subscribe("alerts").await.unwrap();
+    // let nats_subscription = nats_stream_sub_client.get_subscriber().unwrap();
+
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
     let mut new_repo = InMemoryStorage::new(Some(ttl));
     // let mut second_repo = new_repo.clone();
-    nats_kv_client.create_kv_storage("alerts").await.expect("TODO: panic message");
-    let mut nats_kv_store = nats_kv_client.get_kv().unwrap();
-    
+    // nats_kv_client
+    //     .create_kv_storage("alerts")
+    //     .await
+    //     .expect("TODO: panic message");
+    // let mut nats_kv_store = nats_kv_client.get_kv().unwrap();
+
     let kafka_thread = tokio::spawn(async move {
         start_kafka_client(&mut new_repo).await;
     });
-    let mut n = 0;
-    while let Some(message) = &nats_subscription.next().await {
-        n += 1;
+    while let Some(message) = &nats_subscriber.next().await {
         let alert = AlertEntity::from_bytes(&message.payload).unwrap();
-        let mut alert_handler = OccurrenceHandler::init(&alert, &mut nats_kv_store);
-        let mut event = alert_handler.occurrence_handling_flow();
-        nats_stream_pub_client
+        let mut alert_handler = OccurrenceHandler::init(&alert, &mut nats_client);
+        let mut event = alert_handler.occurrence_handling_flow().await;
+        nats_client
             .publish("events", bytes::Bytes::from(event.as_bytes().unwrap()))
             .await
             .unwrap();
-        // if n % 100 == 0 {
-        //     info!("number of docs in storage: {}", &nats_kv_store.get_count());
-        // }
     }
     kafka_thread.await.unwrap();
 }
@@ -73,7 +73,11 @@ async fn start_kafka_client(repo: &mut InMemoryStorage) {
     let kafka_producer = create_kafka_producer(&config);
     read_from_kafka(&kafka_stream_client, &kafka_producer, repo).await
 }
-async fn read_from_kafka(kafka_stream_client: &KafkaConsumerClient, kafka_producer: &KafkaProducerClient, repo: &mut InMemoryStorage) {
+async fn read_from_kafka(
+    kafka_stream_client: &KafkaConsumerClient,
+    kafka_producer: &KafkaProducerClient,
+    repo: &mut InMemoryStorage,
+) {
     let mut n = 0;
     loop {
         n += 1;
@@ -89,15 +93,11 @@ async fn read_from_kafka(kafka_stream_client: &KafkaConsumerClient, kafka_produc
     }
 }
 
-async fn set_nats_client() -> NatsStreamClient {
+async fn set_nats_client() -> NatsDriver {
     let nats_url = env::var("NATS_URL").unwrap();
-    NatsStreamClient::new(&nats_url).await
+    NatsDriver::new(&nats_url).await
 }
 
-async fn set_nats_store() -> NatsJetStreamClient {
-    let nats_url = env::var("NATS_URL").unwrap();
-    NatsJetStreamClient::new(&nats_url).await
-}
 fn create_kafka_client(config: &KafkaClientConfig) -> KafkaConsumerClient {
     KafkaConsumerClient::connect(config)
 }
@@ -115,7 +115,7 @@ where
         Some(msg) => match AlertEntity::from_bytes(&msg) {
             Ok(alert) => {
                 let mut alert_handler = OccurrenceHandler::init(&alert, repo);
-                alert_handler.occurrence_handling_flow()
+                alert_handler.occurrence_handling_flow().await
             }
             Err(err) => {
                 error!("{:?}", err);

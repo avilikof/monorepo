@@ -25,17 +25,17 @@ where
             service: "occurrence-handler".to_string(),
         }
     }
-    pub fn occurrence_handling_flow(&mut self) -> EventEntity {
+    pub async fn occurrence_handling_flow(&mut self) -> EventEntity {
         //     First step - check if alert with same alert_id exists in storage
-        match self.extract_alert_from_repo() {
-            None => self.new_occurrence(),
-            Some(_) => self.handle_existing_alert(),
+        match self.extract_alert_from_repo().await {
+            None => self.new_occurrence().await,
+            Some(_) => self.handle_existing_alert().await,
         }
     }
-    fn new_occurrence(&mut self) -> EventEntity {
+    async fn new_occurrence(&mut self) -> EventEntity {
         const DROP_DESCRIPTION: &str = "dropping new resolved alert";
         match self.received_alert.get_state() {
-            AlertState::Firing => self.first_occurrence(),
+            AlertState::Firing => self.first_occurrence().await,
             AlertState::Resolved => {
                 debug!("{DROP_DESCRIPTION}");
                 EventEntity::drop(
@@ -46,9 +46,9 @@ where
             }
         }
     }
-    fn handle_existing_alert(&mut self) -> EventEntity {
+    async fn handle_existing_alert(&mut self) -> EventEntity {
         const ERROR_MESSAGE: &str = "expected alert to exists in repo but it doesnt";
-        match self.extract_alert_from_repo() {
+        match self.extract_alert_from_repo().await {
             None => {
                 error!("{ERROR_MESSAGE}");
                 EventEntity::log(
@@ -58,27 +58,28 @@ where
                 )
             }
             Some(alert_from_repo) => match alert_from_repo.get_state() {
-                AlertState::Firing => self.existing_alert_firing(),
-                AlertState::Resolved => self.existing_alert_resolved(),
+                AlertState::Firing => self.existing_alert_firing().await,
+                AlertState::Resolved => self.existing_alert_resolved().await,
             },
         }
     }
-    fn first_occurrence(&mut self) -> EventEntity {
+    async fn first_occurrence(&mut self) -> EventEntity {
         const DESCRIPTION: &str = "alert opened";
         let mut new_alert = self.received_alert.clone();
         new_alert.set_new_occurrence_id();
         self.repo
-            .push(new_alert.get_alert_id().to_string(), &mut new_alert);
+            .push(new_alert.get_alert_id().to_string(), &mut new_alert)
+            .await;
         debug!("{DESCRIPTION}");
         EventEntity::open(&mut new_alert, DESCRIPTION, self.service.as_str())
     }
-    fn existing_alert_firing(&mut self) -> EventEntity {
+    async fn existing_alert_firing(&mut self) -> EventEntity {
         const ERROR_DESCRIPTION: &str =
             "old alert has no `occurrence_id` but is expected to have one";
         const REFIRING: &str = "alert refiring";
         match self.received_alert.get_state() {
             AlertState::Firing => {
-                let mut old_alert = self.get_existing_alert_from_repo();
+                let mut old_alert = self.get_existing_alert_from_repo().await;
                 match old_alert.get_occurrence_id() {
                     None => {
                         EventEntity::log(&mut old_alert, ERROR_DESCRIPTION, self.service.as_str())
@@ -89,12 +90,12 @@ where
                     }
                 }
             }
-            AlertState::Resolved => self.resolve(),
+            AlertState::Resolved => self.resolve().await,
         }
     }
-    fn existing_alert_resolved(&mut self) -> EventEntity {
+    async fn existing_alert_resolved(&mut self) -> EventEntity {
         match self.received_alert.get_state() {
-            AlertState::Firing => self.reopen(),
+            AlertState::Firing => self.reopen().await,
             AlertState::Resolved => EventEntity::drop(
                 &mut self.received_alert,
                 "alert dropped id 1",
@@ -102,19 +103,21 @@ where
             ),
         }
     }
-    fn reopen(&mut self) -> EventEntity {
+    async fn reopen(&mut self) -> EventEntity {
         const REOPEN: &str = "alert reopened";
         self.received_alert.set_new_occurrence_id();
-        self.repo.update(
-            self.received_alert.get_alert_id().to_string(),
-            &mut self.received_alert,
-        );
+        self.repo
+            .update(
+                self.received_alert.get_alert_id().to_string(),
+                &mut self.received_alert,
+            )
+            .await;
         EventEntity::reopen(&mut self.received_alert, REOPEN, self.service.as_str())
     }
-    fn resolve(&mut self) -> EventEntity {
+    async fn resolve(&mut self) -> EventEntity {
         const ERROR_ALERT_NOT_IN_REPO: &str = "failure, alert not found in repo";
         const ERROR_DESERIALIZING: &str = "failed to deserialize alert";
-        match self.repo.pull(self.received_alert.get_alert_id()) {
+        match self.repo.pull(self.received_alert.get_alert_id()).await {
             None => {
                 error!("{ERROR_ALERT_NOT_IN_REPO}");
                 EventEntity::log(
@@ -123,26 +126,27 @@ where
                     self.service.as_str(),
                 )
             }
-            Some(alert) => self.resolve_alert(alert.to_owned()),
+            Some(alert) => self.resolve_alert(alert.to_owned()).await,
         }
     }
-    fn resolve_alert(&mut self, mut new_alert: AlertEntity) -> EventEntity {
+    async fn resolve_alert(&mut self, mut new_alert: AlertEntity) -> EventEntity {
         const RESOLVED: &str = "alert resolved";
 
         new_alert.set_state(AlertState::Resolved);
         self.repo
-            .update(new_alert.get_alert_id().to_string(), &mut new_alert);
+            .update(new_alert.get_alert_id().to_string(), &mut new_alert)
+            .await;
         debug!("resolved");
         EventEntity::resolve(&mut new_alert, RESOLVED, self.service.as_str())
     }
-    fn extract_alert_from_repo(&self) -> Option<AlertEntity> {
-        match self.repo.pull(self.received_alert.get_alert_id()) {
-            None => None,
-            Some(payload) => Some(payload.to_owned()),
-        }
+    async fn extract_alert_from_repo(&self) -> Option<AlertEntity> {
+        self.repo
+            .pull(self.received_alert.get_alert_id())
+            .await
+            .map(|payload| payload.to_owned())
     }
-    fn get_existing_alert_from_repo(&self) -> AlertEntity {
-        match self.repo.pull(self.received_alert.get_alert_id()) {
+    async fn get_existing_alert_from_repo(&self) -> AlertEntity {
+        match self.repo.pull(self.received_alert.get_alert_id()).await {
             Some(alert) => alert.to_owned(),
             _ => panic!("something really wrong"),
         }
