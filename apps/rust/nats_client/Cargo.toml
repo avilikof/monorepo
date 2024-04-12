@@ -1,0 +1,19 @@
+[package]
+name = "nats_client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nats_driver = { path = "../../../libs/rust/nats_driver" }
+tokio = {version = "1.36.0", features = ["macros", "rt-multi-thread"] }
+log = "0.4.21"
+env_logger = "0.11.3"
+futures-util = "0.3.30"
+bytes = "1.5.0"
+futures = "0.3.30"
+async-nats = "0.34.0"
+
+alert_entity = { path = "../../../libs/rust/alert_entity" }
+nats_driver_v2 = {path = "../../../libs/rust/nats_driver_v2"}
