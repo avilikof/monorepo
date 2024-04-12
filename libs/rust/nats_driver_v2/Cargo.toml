@@ -1,0 +1,12 @@
+[package]
+name = "nats_driver_v2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+async-nats = "0.34.0"
+log = "0.4.21"
+bytes = "1.5.0"

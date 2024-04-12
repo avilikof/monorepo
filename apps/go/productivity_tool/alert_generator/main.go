@@ -36,8 +36,8 @@ func main() {
 		defer wg.Done()
 		startTime := time.Now()
 		for {
-			//largestNumberStr, err := configurator.Get("LARGEST_NUMBER")
-			//largestNumber, err := strconv.ParseInt(largestNumberStr, 10, 64)
+			// largestNumberStr, err := configurator.Get("LARGEST_NUMBER")
+			// largestNumber, err := strconv.ParseInt(largestNumberStr, 10, 64)
 			alert := alert_entity.RandomAlert(100000)
 			n += 1
 			if n%1000 == 0 {

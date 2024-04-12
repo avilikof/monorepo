@@ -6,6 +6,7 @@ require (
 	github.com/avilikof/monorepo/lib/go/alert_entity v0.1.0
 	github.com/avilikof/monorepo/lib/go/env_var v0.1.0
 	github.com/avilikof/monorepo/lib/go/kafka_driver v0.1.0
+	github.com/nats-io/nats.go v1.33.1
 )
 
 require (
@@ -23,10 +24,9 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
