@@ -59,7 +59,7 @@ impl NatsStorage {
                 Ok(i) => Ok(i),
                 Err(err) => Err(NatsStoreError::PutError(format!("{}", err))),
             },
-            None => todo!(),
+            None => todo!()
         }
     }
     pub async fn update_kv(&mut self, key: &str, value: Bytes) -> Result<u64, NatsStoreError> {
