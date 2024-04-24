@@ -2,7 +2,7 @@ use async_nats::jetstream;
 use async_nats::jetstream::kv::{EntryError, Store};
 use bytes::Bytes;
 
-use crate::nats_context::NatsContext;
+use crate::nats_jet_stream::JetStream;
 
 #[derive(Debug)]
 pub enum NatsStoreError {
@@ -12,16 +12,16 @@ pub enum NatsStoreError {
     DeleteKVError(String),
 }
 #[derive(Default)]
-pub struct NatsStorage {
+pub struct NatsKVStorage {
     storage: Option<Store>,
 }
-impl NatsStorage {
-    pub async fn new(context: &NatsContext, bucket_name: &str) -> Self {
+impl NatsKVStorage {
+    pub async fn new(context: &JetStream, bucket_name: &str) -> Self {
         Self {
             storage: Some(Self::init_storage(context, bucket_name).await),
         }
     }
-    async fn init_storage(context: &NatsContext, bucket_name: &str) -> Store {
+    async fn init_storage(context: &JetStream, bucket_name: &str) -> Store {
         match context.get() {
             None => {
                 panic!("context doesnt exists")

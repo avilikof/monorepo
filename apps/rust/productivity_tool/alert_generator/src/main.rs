@@ -5,6 +5,7 @@ use kafka_driver::{KafkaClientConfig, KafkaProducerClient};
 use log::{error, info};
 use std::env;
 use tokio::time;
+use nats_driver_v2::NatsDriver;
 
 #[tokio::main]
 async fn main() {
@@ -23,8 +24,8 @@ async fn main() {
     let nats_url =
         env::var("NATS_URL").unwrap_or_else(|_| "nats://192.168.32.161:4222".to_string());
 
-    let nats_client = nats_driver::NatsStreamClient::new(&nats_url).await;
-
+    // let nats_client = nats_driver::NatsStreamClient::new(&nats_url).await;
+    let nats_client = NatsDriver::new(&nats_url).await;
     let mut n = 0;
     let mut start_time = time::Instant::now();
     // let producer_kafka = tokio::spawn(async move {
@@ -34,7 +35,7 @@ async fn main() {
             let alert_bytes = random_alert.as_bytes().unwrap();
             // kafka_produce(&alert_bytes, &kafka_producer).await;
             nats_client
-                .publish("alerts", Bytes::from(alert_bytes.to_owned()))
+                .nats_stream_publish("alerts", &alert_bytes)
                 .await
                 .expect("Failure for NATS");
             if n % 10 == 0 {

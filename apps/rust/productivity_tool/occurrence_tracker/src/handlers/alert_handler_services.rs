@@ -1,4 +1,5 @@
 use bytes::Buf;
+use futures_util::future::err;
 use log::error;
 
 use alert_entity::AlertEntity;
@@ -57,7 +58,10 @@ impl RepoInterface for NatsDriver {
                     Ok(alert) => Some(alert),
                 },
             },
-            Err(_) => todo!(),
+            Err(err) => {
+                error!("{:?}", err);
+                None
+            }
         }
     }
 

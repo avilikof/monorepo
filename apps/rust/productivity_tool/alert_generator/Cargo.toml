@@ -11,7 +11,7 @@ env_logger = { version = "0.11" }
 alert_entity = { path = "../../../../libs/rust/alert_entity" }
 kafka_driver = { path = "../../../../libs/rust/kafka_driver" }
 env_loader = { path = "../../../../libs/rust/env_loader" }
-nats_driver = { path = "../../../../libs/rust/nats_driver" }
+nats_driver_v2 = {path = "../../../../libs/rust/nats_driver_v2"}
 log = { version = "0.4" }
 futures = "0.3.30"
 async-nats = "0.34.0"
