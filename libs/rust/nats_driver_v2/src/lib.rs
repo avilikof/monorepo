@@ -28,7 +28,7 @@ pub enum NatsDriverError {
     FailedPublishingToJetStream(PublishError),
     StorePullKVError(NatsStoreError),
     NatsStreamError(StreamError),
-    NatsStreamPublishError(StreamError)
+    NatsStreamPublishError(StreamError),
 }
 pub struct NatsDriver {
     nats_stream: NatsStream,
@@ -50,18 +50,26 @@ impl NatsDriver {
             Ok(s) => self.nats_stream = s,
         }
     }
-    
+
     pub async fn get_subscriber(&mut self, subject: &str) -> Result<Subscriber, NatsDriverError> {
         match self.nats_stream.subscriber(subject).await {
             Err(err) => Err(NatsDriverError::NatsStreamError(err)),
-            Ok(subscr) => Ok(subscr)
+            Ok(subscr) => Ok(subscr),
         }
     }
-    
-    pub async fn nats_stream_publish(&self, subject: &str, payload: &[u8]) -> Result<(), NatsDriverError> {
-        match self.nats_stream.publish(subject, bytes::Bytes::copy_from_slice(payload)).await {
-            Err(err) =>  Err(NatsDriverError::NatsStreamPublishError(err)),
-            Ok(_) => Ok(())
+
+    pub async fn nats_stream_publish(
+        &self,
+        subject: &str,
+        payload: Vec<u8>,
+    ) -> Result<(), NatsDriverError> {
+        match self
+            .nats_stream
+            .publish(subject, bytes::Bytes::copy_from_slice(&payload))
+            .await
+        {
+            Err(err) => Err(NatsDriverError::NatsStreamPublishError(err)),
+            Ok(_) => Ok(()),
         }
     }
 }
@@ -78,7 +86,7 @@ impl NatsDriver {
 //         };
 //         self.kv_store = NatsKVStorage::new(&self.jet_stream, bucket_name).await
 //     }
-// 
+//
 //     pub fn get_client(&self) -> &NatsStream {
 //         &self.nats_stream
 //     }

@@ -5,7 +5,7 @@ use bytes::Bytes;
 pub enum StreamError {
     SubscribeError(SubscribeError),
     ConnectionError(ConnectError),
-    StreamPublishError(PublishError)
+    StreamPublishError(PublishError),
 }
 #[derive(Clone)]
 pub struct NatsStream {
@@ -20,7 +20,7 @@ impl NatsStream {
         }
     }
 
-    pub fn _get(&self) -> &Client {
+    pub fn get(&self) -> &Client {
         &self.client
     }
     /// Returns JetStream subscriber subscribed to subject
@@ -30,9 +30,9 @@ impl NatsStream {
             Err(err) => Err(StreamError::SubscribeError(err)),
         }
     }
-    pub async fn publish(&self, subject: &str, payload: Bytes ) -> Result<(), StreamError> {
+    pub async fn publish(&self, subject: &str, payload: Bytes) -> Result<(), StreamError> {
         match self.client.publish(subject.to_owned(), payload).await {
-            Err(err) =>  Err(StreamError::StreamPublishError(err)),
+            Err(err) => Err(StreamError::StreamPublishError(err)),
             Ok(_) => Ok(()),
         }
     }

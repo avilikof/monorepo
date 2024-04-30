@@ -51,7 +51,7 @@ async fn main() {
         let alert = AlertEntity::from_bytes(&message.payload).unwrap();
         let mut alert_handler = OccurrenceHandler::init(&alert, &mut nats_client);
         let mut event = alert_handler.occurrence_handling_flow().await;
-        nats_client
+        nats_client.
             .publish("events", bytes::Bytes::from(event.as_bytes().unwrap()))
             .await
             .unwrap();

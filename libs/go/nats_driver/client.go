@@ -11,9 +11,7 @@ type Client struct {
 	client *nats.Conn
 }
 
-func (c *Client) Default(url *string) *Client {
-	// client, err := nats.Conn{}
-	//
+func DefaultClient(url *string) *Client {
 	opts := nats.Options{
 		Url:            *url,
 		AllowReconnect: true,

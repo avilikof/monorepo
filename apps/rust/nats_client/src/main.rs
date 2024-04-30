@@ -12,7 +12,6 @@ use futures_util::StreamExt;
 
 use log::{error, info};
 use nats_driver_v2::NatsDriver;
-use tokio::sync::Semaphore;
 use tokio::time;
 use tokio::time::sleep;
 
@@ -23,26 +22,42 @@ async fn main() {
     let nats_url =
         std::env::var("NATS_URL").unwrap_or_else(|_| "nats://192.168.32.161:4222".to_string());
 
-    let mut nats_client= NatsDriver::new(&nats_url).await;
+    let mut nats_client = NatsDriver::new(&nats_url).await;
 
-    let mut stream_subscriber = nats_client.get_subscriber("alerts").await.unwrap();
-    
-    let time_after_connected = time::Instant::now();
+    let mut stream_subscriber = nats_client.get_subscriber("new_alerts").await.unwrap();
 
+    let mut time_after_connected = time::Instant::now();
+
+    let mut n = 0;
     let task = tokio::spawn(async move {
         while let Some(msg) = &stream_subscriber.next().await {
-            println!("{:?}",&msg.payload);
+            n += 1;
+            if n % 100000 == 0 {
+                println!(
+                    "Time spent: {:?}",
+                    time::Instant::now() - time_after_connected
+                );
+                time_after_connected = time::Instant::now();
+            }
             if &msg.payload == "end" {
-                break
+                break;
             }
         }
     });
-    nats_client.nats_stream_publish("alerts", "this is it".as_bytes()).await.unwrap();
-    nats_client.nats_stream_publish("alerts", "end".as_bytes()).await.unwrap();
+    nats_client
+        .nats_stream_publish("alerts", "this is it".as_bytes().to_vec())
+        .await
+        .unwrap();
+    nats_client
+        .nats_stream_publish("alerts", "end".as_bytes().to_vec())
+        .await
+        .unwrap();
     task.await.unwrap();
     println!("Time spent: {:?}", total_time.elapsed());
-    println!("Time without connection: {:?}", time_after_connected.elapsed());
-
+    println!(
+        "Time without connection: {:?}",
+        time_after_connected.elapsed()
+    );
 }
 
 //     client.init_jet_stream().await;
