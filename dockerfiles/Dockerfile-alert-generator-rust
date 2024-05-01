@@ -1,47 +1,45 @@
+# syntax=docker/dockerfile:1
+
+# Base stage for cloning the repo
+FROM rust:latest as code
+WORKDIR /monorepo
+RUN apt-get update -y && \
+    apt-get install -y git && \
+    git clone https://github.com/avilikof/monorepo .
+
+# Builder stage
 FROM rust:latest as builder
-# Set working directory to the service1 directory
 WORKDIR /monorepo
 
-# Copy the service1 source code and lib1 modules
-COPY ../apps/rust /monorepo/apps/rust
-COPY ../Cargo.toml .
-COPY ../Cargo.lock .
-COPY ../libs/rust ./libs/rust
-COPY ../.env .
+# Copy the entire repository from the previous stage
+COPY --from=code /monorepo .
 
+# Install necessary packages
+RUN apt-get update -y && \
+    apt-get install -y libsasl2-dev openssl musl-tools && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -y
-RUN apt-get install -y libsasl2-dev
-RUN apt-get install -y openssl
-RUN apt-get install -y musl-tools
+# Uncomment if you need to target musl for a fully static binary
+# RUN rustup target add x86_64-unknown-linux-musl
 
-#RUN rustup target add x86_64-unknown-linux-musl
-#RUN cd /monorepo/apps/rust/productivity_tool/occurrence_tracker && \
-#    RUST_LOG=debug cargo build --target x86_64-unknown-linux-musl --release
-
+# Build the Rust application
 RUN cargo build --release -p alert_generator
-#CMD ["/monorepo/target/release/occurrence_tracker"]
 
-# Create a minimal image for the final stage
+# Final stage
 FROM debian:bookworm-slim as template-rust
+WORKDIR /app
 
-# Set working directory
-WORKDIR /monorepo
+# Install runtime dependencies
+RUN apt-get update -y && \
+    apt-get install -y libsasl2-dev openssl ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+# Copy the built binary and any other necessary files from the builder stage
+COPY --from=builder /monorepo/target/release/alert_generator /app/
+COPY --from=builder /monorepo/.env /app/
 
-RUN apt-get update -y
-RUN apt-get install -y libsasl2-dev
-RUN apt-get install -y openssl
-RUN apt-get install ca-certificates
-RUN apt-get clean
-
-
-# Copy the built binary from the builder stage
-COPY --from=builder /monorepo/target/release/alert_generator .
-COPY --from=builder /monorepo/.env .
-#COPY --from=builder /monorepo/apps/rust/productivity_tool/occurrence_tracker/target/x86_64-unknown-linux-musl/release/occurrence_tracker .
-
-# Run the service when the container starts
-
+# Set environment variables and run the service
 ENV RUST_LOG=info
 CMD ["./alert_generator"]
