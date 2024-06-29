@@ -28,21 +28,9 @@ async fn main() {
     let mut nats_client = set_nats_client().await;
     let mut nats_subscriber = nats_client.get_subscriber("alerts").await.unwrap();
 
-    // let mut nats_stream_sub_client = set_nats_client().await;
-    // let nats_stream_pub_client = set_nats_client().await;
-    // let mut nats_kv_client = set_nats_store().await;
-    // nats_stream_sub_client.subscribe("alerts").await.unwrap();
-    // let nats_subscription = nats_stream_sub_client.get_subscriber().unwrap();
-
     let ttl_as_string = env::var("TTL").unwrap();
     let ttl = time::Duration::from_secs(ttl_as_string.parse().unwrap());
     let mut new_repo = InMemoryStorage::new(Some(ttl));
-    // let mut second_repo = new_repo.clone();
-    // nats_kv_client
-    //     .create_kv_storage("alerts")
-    //     .await
-    //     .expect("TODO: panic message");
-    // let mut nats_kv_store = nats_kv_client.get_kv().unwrap();
 
     let kafka_thread = tokio::spawn(async move {
         start_kafka_client(&mut new_repo).await;
@@ -51,8 +39,8 @@ async fn main() {
         let alert = AlertEntity::from_bytes(&message.payload).unwrap();
         let mut alert_handler = OccurrenceHandler::init(&alert, &mut nats_client);
         let mut event = alert_handler.occurrence_handling_flow().await;
-        nats_client.
-            .publish("events", bytes::Bytes::from(event.as_bytes().unwrap()))
+        nats_client
+            .nats_stream_publish("events", event.as_bytes().unwrap())
             .await
             .unwrap();
     }
