@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 
-async-nats = "0.34.0"
-log = "0.4.21"
-bytes = "1.5.0"
+async-nats = "0.35.1"
+log = "0.4.22"
+bytes = "1.7.1"

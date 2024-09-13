@@ -123,14 +123,14 @@ impl KafkaConsumerClient {
 }
 
 impl KafkaProducerClient {
-    pub fn new(cfg: &KafkaClientConfig) -> Self {
+    pub fn new(cfg: KafkaClientConfig) -> Self {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", &cfg.bootstrap_server)
-            .set("security.protocol", "SASL_SSL")
-            .set("sasl.mechanisms", "SCRAM-SHA-256")
-            .set("sasl.username", &cfg.user)
-            .set("sasl.password", &cfg.pass)
-            .set("ssl.ca.location", "/etc/ssl/certs")
+            // .set("security.protocol", "SASL_SSL")
+            // .set("sasl.mechanisms", "SCRAM-SHA-256")
+            // .set("sasl.username", &cfg.user)
+            // .set("sasl.password", &cfg.pass)
+            // .set("ssl.ca.location", "/etc/ssl/certs")
             // Additional producer-specific configurations can be set here
             .create()
             .expect("Producer creation error");

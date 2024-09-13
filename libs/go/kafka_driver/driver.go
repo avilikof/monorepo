@@ -2,9 +2,10 @@ package kafka_driver
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/avilikof/monorepo/lib/go/env_var"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"time"
 )
 
 type KafkaHandler struct {

@@ -1,3 +1,4 @@
+pub mod connection;
 mod nats_jet_stream;
 mod nats_store;
 mod nats_stream;
