@@ -16,6 +16,7 @@ version = "1.0.0"
 gleam_stdlib = "~> 0.34 or ~> 1.0"
 birl = "~> 1.5"
 glats = "~> 0.6"
+# erlnats = { git = "https://github.com/nats-io/nats.ex", tag = "0.7.0" }
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

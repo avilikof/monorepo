@@ -47,6 +47,7 @@ impl RepoInterface for InMemoryStorage {
 
 impl RepoInterface for NatsDriver {
     async fn pull(&self, key: &str) -> Option<AlertEntity> {
+        self.
         match self.pull_kv(key).await {
             Ok(msg) => match msg {
                 None => None,

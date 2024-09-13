@@ -1,1 +1,0 @@
-sed -i 's/VERSION=docker/VERSION=docker\n      - PLEX_CLAIM=claim-BhcXpjosPseLQfjM7smy/' ~/umbrel/app-data/plex/docker-compose.yml

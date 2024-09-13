@@ -12,15 +12,16 @@ import (
 
 type AlertEntity struct {
 	OccurrenceId string `json:"occurrenceId"`
-	Timestamp    int64  `json:"timestamp"`
 	Description  string `json:"description"`
 	State        string `json:"state"`
 	AlertId      string `json:"alertId"`
+	Timestamp    int64  `json:"timestamp"`
 }
 
 func NewAlertEntity() *AlertEntity {
 	return &AlertEntity{}
 }
+
 func CreateAlertEntity(occurrenceId, description, state, alertId string, timestamp int64) AlertEntity {
 	return AlertEntity{
 		OccurrenceId: occurrenceId,
@@ -56,22 +57,28 @@ func RandomAlert(largestNumber int64) AlertEntity {
 func (a *AlertEntity) GetOccurrenceId() string {
 	return a.OccurrenceId
 }
+
 func (a *AlertEntity) GetTimestamp() int64 {
 	return a.Timestamp
 }
+
 func (a *AlertEntity) GetDescription() string {
 	return a.Description
 }
+
 func (a *AlertEntity) GetState() string {
 	return a.State
 }
+
 func (a *AlertEntity) GetAlertId() string {
 	return a.AlertId
 }
+
 func (a *AlertEntity) SetDescription(desc string) error {
 	a.Description = desc
 	return nil
 }
+
 func (a *AlertEntity) SetOccurrenceId(id string) error {
 	if a.OccurrenceId != "" {
 		return fmt.Errorf("occurrenceId is set, cannot change")
@@ -79,6 +86,7 @@ func (a *AlertEntity) SetOccurrenceId(id string) error {
 	a.OccurrenceId = id
 	return nil
 }
+
 func (a *AlertEntity) SetState(state string) error {
 	if state != "firing" && state != "resolved" {
 		return fmt.Errorf("unsuported state provided")
@@ -86,6 +94,7 @@ func (a *AlertEntity) SetState(state string) error {
 	a.State = state
 	return nil
 }
+
 func (a *AlertEntity) ToByte() ([]byte, error) {
 	if *a == *NewAlertEntity() {
 		return nil, fmt.Errorf("alert contains no data")

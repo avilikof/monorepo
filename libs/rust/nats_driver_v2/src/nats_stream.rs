@@ -3,9 +3,9 @@ use bytes::Bytes;
 
 #[derive(Debug)]
 pub enum StreamError {
-    SubscribeError(SubscribeError),
-    ConnectionError(ConnectError),
-    StreamPublishError(PublishError),
+    Subscribe(SubscribeError),
+    Connection(ConnectError),
+    StreamPublish(PublishError),
 }
 #[derive(Clone)]
 pub struct NatsStream {
@@ -27,19 +27,19 @@ impl NatsStream {
     pub async fn subscriber(&mut self, subject: &str) -> Result<Subscriber, StreamError> {
         match self.client.subscribe(subject.to_owned()).await {
             Ok(s) => Ok(s),
-            Err(err) => Err(StreamError::SubscribeError(err)),
+            Err(err) => Err(StreamError::Subscribe(err)),
         }
     }
     pub async fn publish(&self, subject: &str, payload: Bytes) -> Result<(), StreamError> {
         match self.client.publish(subject.to_owned(), payload).await {
-            Err(err) => Err(StreamError::StreamPublishError(err)),
+            Err(err) => Err(StreamError::StreamPublish(err)),
             Ok(_) => Ok(()),
         }
     }
 }
 async fn connect_to_server(url: &str) -> Result<Client, StreamError> {
     match async_nats::connect(url).await {
-        Err(err) => Err(StreamError::ConnectionError(err)),
+        Err(err) => Err(StreamError::Connection(err)),
         Ok(c) => Ok(c),
     }
 }
