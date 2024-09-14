@@ -126,6 +126,8 @@ impl KafkaProducerClient {
     pub fn new(cfg: KafkaClientConfig) -> Self {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", &cfg.bootstrap_server)
+            .set("batch.num.messages", "10000")
+            .set("linger.ms", "5")
             // .set("security.protocol", "SASL_SSL")
             // .set("sasl.mechanisms", "SCRAM-SHA-256")
             // .set("sasl.username", &cfg.user)
@@ -142,17 +144,17 @@ impl KafkaProducerClient {
         &self,
         topic: &str,
         key: &str,
-        message: &[u8],
+        message: Vec<u8>,
     ) -> Result<(), KafkaError> {
         let record = FutureRecord::to(topic)
-            .payload(message)
+            .payload(&message)
             .key(key)
             // You can add timestamp or headers if needed
             ;
 
         match self.producer.send(record, Timeout::Never).await {
             Ok(_delivery) => {
-                debug!("Message sent successfully to topic {topic}");
+                debug!("Message sent successfully to topic :: {topic}");
                 Ok(())
             }
             Err(e) => {
