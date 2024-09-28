@@ -1,87 +1,74 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	kafkadriver "go-mono/pkg/kafka_driver"
-	"io"
-	"net/http"
+	"log/slog"
+	"sync"
+	"time"
 )
 
-type Coordinates struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-}
-
-// Define the main structure for the response
-type Place struct {
-	Code                   string      `json:"code"`
-	Name                   string      `json:"name"`
-	AdministrativeDivision string      `json:"administrativeDivision"`
-	CountryCode            string      `json:"countryCode"`
-	Coordinates            Coordinates `json:"coordinates"`
-}
 
 func main() {
-	// The URL to send the GET request to
-	const urlPlaces string = "https://api.meteo.lt/v1/places"
+	ctx := context.Background()
+
+	placesUrl, _ := PlacesUrl.GetUrl(nil)
 	places := make([]Place, 0, 3000)
 
-	resp, err := getResponse(urlPlaces)
+	redisHandler := NewRedisHandler("192.168.32.161:32779")
+
+	body, err := GetResponse(placesUrl)
 	if err != nil {
 		panic(err)
 	}
-
-	// Perform the HTTP GET request
-	defer resp.Body.Close() // Ensure the response body is closed
-
-	// Read the response body
-	body, err := getBody(resp)
-
-	if err != nil {
-		fmt.Println("Error reading response:", err)
-		return
-	}
-
-	// Write data to kafka
 
 	err = json.Unmarshal([]byte(body), &places)
 	if err != nil {
 		panic(err)
 	}
 
+	slog.Info("Start writing..")
+	startTime := time.Now()
+	var wg sync.WaitGroup
 	// Print the response body
 	for _, a := range places {
-		fmt.Printf("Code: %s\n", a.Code)
-		err = writeToKakfa([]byte(string(a.Code)))
+		wg.Add(1)
+		key := a.Code
+		data, err := json.Marshal(a)
 		if err != nil {
+			panic(err)
+		}
+		go func (){
+			if err := redisHandler.Write(ctx,&wg, key, &data); err != nil {
+				panic(err)
+			}
+		}()
+	}
+	wg.Wait()
+	slog.Info("Finished writing to redis", "time spent", time.Since(startTime))
+
+	numClients := redisHandler.Keys(ctx, "*")
+	fmt.Println(redisHandler.DBSize(ctx))
+	time.Sleep(5 * time.Second)
+
+	for _, place := range numClients {
+		body, err := getForecasts(place)
+		if err != nil {
+			continue
+		}
+		shortForcastKey := fmt.Sprintf("short_forcast_%s", place)
+		if err := redisHandler.Write(ctx, nil, shortForcastKey, &body); err != nil {
 			panic(err)
 		}
 	}
 }
 
-func getResponse(url string) (*http.Response, error) {
-	resp, err := http.Get(url)
+
+func getForecasts(code string) ([]byte, error) {
+	url, err := ForecastsUrl.GetUrl(&code)
 	if err != nil {
-		// Handle error if request fails
-		fmt.Println("Error:", err)
-		return nil, err
+		panic(err)
 	}
-
-	// Check if the response status is 200 OK
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("Error: got status code %d\n", resp.StatusCode))
-	}
-
-	return resp, nil
-}
-
-func getBody(resp *http.Response) ([]byte, error) {
-	return io.ReadAll(resp.Body)
-}
-
-func writeToKakfa(payload []byte) error {
-	kafkaHandler := kafkadriver.NewKafkaHandler("192.168.32.161")
-	return kafkaHandler.Push([]byte("weather"), payload, "test")
+	return GetResponse(url)
 }

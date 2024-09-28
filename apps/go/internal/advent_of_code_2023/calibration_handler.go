@@ -71,9 +71,9 @@ func getNumbersFromString(s string) []uint {
 	var nums []uint
 	for _, r := range s {
 		if unicode.IsDigit(r) {
-			n, err := to_uint8(string(r))
-			if err != nil {
-				panic(err)
+			n, _err := to_uint8(string(r))
+			if _err != nil {
+				panic(_err)
 			}
 			nums = append(nums, n)
 		}
@@ -89,9 +89,9 @@ func checkIfWordIsNumber(line rune) {
 }
 
 func ReadFile(path string) ([]byte, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return data, err
+	data, _err := os.ReadFile(path)
+	if _err != nil {
+		return data, _err
 	}
 	return data, nil
 }
@@ -103,9 +103,9 @@ func joinTwoNumber(a, b uint) uint {
 }
 
 func to_uint8(numberAsString string) (uint, error) {
-	value, err := strconv.ParseUint(numberAsString, 10, 8)
-	if err != nil {
-		return 0, err
+	value, _err := strconv.ParseUint(numberAsString, 10, 8)
+	if _err != nil {
+		return 0, _err
 	}
 	return uint(value), nil
 }

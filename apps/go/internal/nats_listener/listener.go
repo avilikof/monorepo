@@ -9,16 +9,16 @@ import (
 )
 
 func Listen(url, subject string) error {
-	nc, err := natsdriver.NewNatsConnection(&url)
+	nc, _err := natsdriver.NewNatsConnection(&url)
 	defer nc.Close()
-	if err != nil {
-		return err
+	if _err != nil {
+		return _err
 	}
 	ps := natsdriver.NewPubSub(nc)
 
-	err = ps.Subscribe(subject, printMessage)
-	if err != nil {
-		log.Fatalf("Error subscribing to subject: %v", err)
+	_err = ps.Subscribe(subject, printMessage)
+	if _err != nil {
+		log.Fatalf("Error subscribing to subject: %v", _err)
 	}
 	return nil
 }

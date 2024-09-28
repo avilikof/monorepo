@@ -14,13 +14,13 @@ func NewAlertHandler(pubSub storageInterface) *AlertHandler {
 }
 
 func (self *AlertHandler) PullNewAlert(subject string, storage storageInterface) (*alert_entity.AlertEntity, error) {
-	alertBytes, err := storage.Pull(subject)
-	if err != nil {
-		return nil, err
+	alertBytes, _err := storage.Pull(subject)
+	if _err != nil {
+		return nil, _err
 	}
-	alert, err := alert_entity.NewAlertEntityFromBytes(alertBytes)
-	if err != nil {
-		return nil, err
+	alert, _err := alert_entity.NewAlertEntityFromBytes(alertBytes)
+	if _err != nil {
+		return nil, _err
 	}
 	return alert, nil
 }

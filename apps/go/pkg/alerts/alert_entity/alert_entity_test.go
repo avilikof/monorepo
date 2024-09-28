@@ -44,22 +44,22 @@ func TestNewAlertEntityFromBytes(t *testing.T) {
 	alert := CreateAlertEntity("123", "Test alert", "firing", "456", time.Now().UnixNano())
 	data, _ := json.Marshal(alert)
 
-	newAlert, err := NewAlertEntityFromBytes(data)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
+	newAlert, _err := NewAlertEntityFromBytes(data)
+	if _err != nil {
+		t.Errorf("Unexpected error: %v", _err)
 	}
 
 	if *newAlert != alert {
 		t.Error("Unmarshaled alert does not match original")
 	}
 
-	_, err = NewAlertEntityFromBytes([]byte("invalid json"))
-	if err == nil {
+	_, _err = NewAlertEntityFromBytes([]byte("invalid json"))
+	if _err == nil {
 		t.Error("Expected error for invalid JSON, got nil")
 	}
 
-	_, err = NewAlertEntityFromBytes([]byte("{}"))
-	if err == nil || err.Error() != "empty alert" {
+	_, _err = NewAlertEntityFromBytes([]byte("{}"))
+	if _err == nil || _err.Error() != "empty alert" {
 		t.Error("Expected 'empty alert' error for empty JSON object")
 	}
 }
@@ -76,8 +76,8 @@ func TestRandomAlert(t *testing.T) {
 	if alert.State != "firing" && alert.State != "resolved" {
 		t.Error("RandomAlert should have either 'firing' or 'resolved' as State")
 	}
-	alertId, err := strconv.ParseInt(alert.AlertId, 10, 64)
-	if err != nil || alertId < 1 || alertId > 10 {
+	alertId, _err := strconv.ParseInt(alert.AlertId, 10, 64)
+	if _err != nil || alertId < 1 || alertId > 10 {
 		t.Error("RandomAlert should have AlertId between 1 and 10")
 	}
 }
@@ -98,23 +98,23 @@ func TestAlertEntityMethods(t *testing.T) {
 		t.Error("GetAlertId failed")
 	}
 
-	err := alert.SetDescription("New description")
-	if err != nil || alert.Description != "New description" {
+	_err := alert.SetDescription("New description")
+	if _err != nil || alert.Description != "New description" {
 		t.Error("SetDescription failed")
 	}
 
-	err = alert.SetOccurrenceId("789")
-	if err == nil {
+	_err = alert.SetOccurrenceId("789")
+	if _err == nil {
 		t.Error("SetOccurrenceId should fail when OccurrenceId is already set")
 	}
 
-	err = alert.SetState("resolved")
-	if err != nil || alert.State != "resolved" {
+	_err = alert.SetState("resolved")
+	if _err != nil || alert.State != "resolved" {
 		t.Error("SetState failed")
 	}
 
-	err = alert.SetState("invalid")
-	if err == nil {
+	_err = alert.SetState("invalid")
+	if _err == nil {
 		t.Error("SetState should fail with invalid state")
 	}
 }
@@ -122,15 +122,15 @@ func TestAlertEntityMethods(t *testing.T) {
 func TestAlertEntityToByte(t *testing.T) {
 	alert := CreateAlertEntity("123", "Test alert", "firing", "456", time.Now().UnixNano())
 
-	data, err := alert.ToByte()
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
+	data, _err := alert.ToByte()
+	if _err != nil {
+		t.Errorf("Unexpected error: %v", _err)
 	}
 
 	var newAlert AlertEntity
-	err = json.Unmarshal(data, &newAlert)
-	if err != nil {
-		t.Errorf("Failed to unmarshal: %v", err)
+	_err = json.Unmarshal(data, &newAlert)
+	if _err != nil {
+		t.Errorf("Failed to unmarshal: %v", _err)
 	}
 
 	if newAlert != alert {
@@ -138,8 +138,8 @@ func TestAlertEntityToByte(t *testing.T) {
 	}
 
 	emptyAlert := NewAlertEntity()
-	_, err = emptyAlert.ToByte()
-	if err == nil {
+	_, _err = emptyAlert.ToByte()
+	if _err == nil {
 		t.Error("ToByte should return error for empty alert")
 	}
 }

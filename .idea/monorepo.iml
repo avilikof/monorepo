@@ -17,6 +17,8 @@
       <sourceFolder url="file://$MODULE_DIR$/apps/rust/nats_client/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/rust/nats_driver_v2/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/apps/rust/advent_of_code_2023/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/weather_app/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/rust/hello_world/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/env_loader/target" />
       <excludeFolder url="file://$MODULE_DIR$/libs/rust/kafka_driver/target" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />

@@ -6,20 +6,20 @@ import (
 )
 
 func main() {
-	config, err := config_handler.NewEnvVarHandler()
-	if err != nil {
-		panic(err)
+	config, _err := config_handler.NewEnvVarHandler()
+	if _err != nil {
+		panic(_err)
 	}
 	config.LoadYaml("/Users/alex/git/monorepo/apps/go/configs/config.yaml")
 
-	natsAddr, err := config.Get("nats.addr")
-	if err != nil {
-		panic(err)
+	natsAddr, _err := config.Get("nats.addr")
+	if _err != nil {
+		panic(_err)
 	}
 
 	subject := "test"
-	err = natslistener.Listen(natsAddr, subject)
-	if err != nil {
-		panic(err)
+	_err = natslistener.Listen(natsAddr, subject)
+	if _err != nil {
+		panic(_err)
 	}
 }

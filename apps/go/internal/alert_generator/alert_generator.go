@@ -11,9 +11,9 @@ func newRandomAlert() *alert_entity.AlertEntity {
 
 func PublishAlert(subbject string, pubInt PubInterface) error {
 	alert := newRandomAlert()
-	alertAsByte, err := alert.ToByte()
-	if err != nil {
-		return err
+	alertAsByte, _err := alert.ToByte()
+	if _err != nil {
+		return _err
 	}
 	pubInt.Publish(subbject, alertAsByte)
 	return nil

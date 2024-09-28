@@ -19,9 +19,9 @@ func NewNatsConnection(url *string) (*NatsConnection, error) {
 		return nil, errors.New("url cannot be blank")
 	}
 	opts := setDefaultNatsOpts(url)
-	conn, err := opts.Connect()
-	if err != nil {
-		return nil, err
+	conn, _err := opts.Connect()
+	if _err != nil {
+		return nil, _err
 	}
 	return &NatsConnection{
 		connection: conn,

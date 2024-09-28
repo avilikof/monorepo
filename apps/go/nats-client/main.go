@@ -15,9 +15,9 @@ func main() {
 	url := "nats://192.168.32.161:4222"
 	alert := alert_entity.RandomAlert(1000)
 	// fmt.Println(alert)
-	alertByte, err := alert.ToByte()
-	if err != nil {
-		panic(err)
+	alertByte, _err := alert.ToByte()
+	if _err != nil {
+		panic(_err)
 	}
 	natsClient := nats_driver.DefaultClient(&url)
 	defer natsClient.Close()
@@ -37,9 +37,9 @@ func main() {
 			time.Sleep(2 * time.Second)
 		}
 	}(subject, &wg)
-	err = natsClient.Push(&subject, alertByte)
-	if err != nil {
-		panic(err)
+	_err = natsClient.Push(&subject, alertByte)
+	if _err != nil {
+		panic(_err)
 	}
 	time.Sleep(1 * time.Second)
 	for range 2 {

@@ -8,28 +8,28 @@ import (
 )
 
 func main() {
-	config, err := config_handler.NewEnvVarHandler()
-	if err != nil {
-		panic(err)
+	config, _err := config_handler.NewEnvVarHandler()
+	if _err != nil {
+		panic(_err)
 	}
 	config.LoadYaml("/Users/alex/git/monorepo/apps/go/configs/config.yaml")
 
-	natsAddr, err := config.Get("nats.addr")
-	if err != nil {
-		panic(err)
+	natsAddr, _err := config.Get("nats.addr")
+	if _err != nil {
+		panic(_err)
 	}
 
-	natsConnnection, err := natsdriver.NewNatsConnection(&natsAddr)
-	if err != nil {
-		panic(err)
+	natsConnnection, _err := natsdriver.NewNatsConnection(&natsAddr)
+	if _err != nil {
+		panic(_err)
 	}
 
 	defer natsConnnection.Close()
 
 	pubSubClient := natsdriver.NewPubSub(natsConnnection)
 	defer pubSubClient.Close()
-	err = pubSubClient.Publish("test", []byte("hello"))
-	if err != nil {
-		log.Err(err)
+	_err = pubSubClient.Publish("test", []byte("hello"))
+	if _err != nil {
+		log.Err(_err)
 	}
 }

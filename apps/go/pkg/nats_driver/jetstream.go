@@ -17,9 +17,9 @@ type JS struct {
 }
 
 func NewJetStream(nc *NatsConnection) (*JS, error) {
-	js, err := jetstream.New(nc.connection)
-	if err != nil {
-		return nil, err
+	js, _err := jetstream.New(nc.connection)
+	if _err != nil {
+		return nil, _err
 	}
 	return &JS{
 		nc,
@@ -34,20 +34,20 @@ func (js *JS) CreateNewStream(subject, streamName string) (*context.CancelFunc, 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	js.ctx = ctx
 
-	stream, err := js.jetStream.CreateStream(ctx, jetstream.StreamConfig{
+	stream, _err := js.jetStream.CreateStream(ctx, jetstream.StreamConfig{
 		Name:     streamName,
 		Subjects: []string{subject}},
 	)
-	if err != nil {
+	if _err != nil {
 		cancel()
-		fmt.Println("Error creating stream:", err)
-		return nil, err
+		fmt.Println("Error creating stream:", _err)
+		return nil, _err
 	}
 	js.stream = stream
-	cons, err := js.stream.CreateOrUpdateConsumer(js.ctx, jetstream.ConsumerConfig{})
-	if err != nil {
+	cons, _err := js.stream.CreateOrUpdateConsumer(js.ctx, jetstream.ConsumerConfig{})
+	if _err != nil {
 		cancel()
-		return nil, err
+		return nil, _err
 	}
 	js.Publush(subject, []byte("test asd"))
 	wg := sync.WaitGroup{}

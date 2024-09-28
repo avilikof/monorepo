@@ -56,9 +56,9 @@ fn processByLine(data: *const []u8) !void {
     const a: u8 = 0;
     while (lines.next()) |line| {
         std.debug.print("Line: {s}\n", .{line});
-        _ = readLetter(allocator, line, a) catch |err| {
-            std.debug.print("error: {}", .{err});
-            return err;
+        _ = readLetter(allocator, line, a) catch |_err| {
+            std.debug.print("error: {}", .{_err});
+            return _err;
         };
     }
 }
@@ -160,8 +160,8 @@ fn testInvalidCases() !void {
     };
 
     for (invalid_cases) |input| {
-        _ = parseStringToInt(input) catch |err| {
-            try std.testing.expectError(error.ParseIntError, .{err});
+        _ = parseStringToInt(input) catch |_err| {
+            try std.testing.expectError(error.ParseIntError, .{_err});
         };
         // try std.debug.assert(false, "Expected failure but got {d}", .{result});
         // std.testing.expectError(expected_error: anyerror, actual_error_union: anytype)

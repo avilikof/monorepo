@@ -15,9 +15,9 @@ func TestNewCalibrationHandler(t *testing.T) {
 // func TestPutFileContent(t *testing.T) {
 // 	doc := NewCalibrationDocument()
 // 	content := []byte("test content")
-// 	err := doc.PutFileContent(content)
-// 	if err != nil {
-// 		t.Errorf("PutFileContent returned error: %v", err)
+// 	_err := doc.PutFileContent(content)
+// 	if _err != nil {
+// 		t.Errorf("PutFileContent returned error: %v", _err)
 // 	}
 // 	if string(doc.fileContent) != string(content) {
 // 		t.Errorf("Expected %v, got %v", content, doc.fileContent)
@@ -27,9 +27,9 @@ func TestNewCalibrationHandler(t *testing.T) {
 // func TestPutLines(t *testing.T) {
 // 	doc := NewCalibrationDocument()
 // 	lines := []string{"line1", "line2"}
-// 	err := doc.PutLines(lines)
-// 	if err != nil {
-// 		t.Errorf("PutLines returned error: %v", err)
+// 	_err := doc.PutLines(lines)
+// 	if _err != nil {
+// 		t.Errorf("PutLines returned error: %v", _err)
 // 	}
 // 	if len(doc.lines) != len(lines) {
 // 		t.Errorf("Expected %v, got %v", lines, doc.lines)
@@ -38,16 +38,16 @@ func TestNewCalibrationHandler(t *testing.T) {
 
 // func TestGetFileContentString(t *testing.T) {
 // 	doc := NewCalibrationDocument()
-// 	_, err := doc.GetFileContentString()
-// 	if err == nil {
+// 	_, _err := doc.GetFileContentString()
+// 	if _err == nil {
 // 		t.Error("Expected error, got nil")
 // 	}
 
 // 	content := []byte("test content")
 // 	doc.PutFileContent(content)
-// 	str, err := doc.GetFileContentString()
-// 	if err != nil {
-// 		t.Errorf("GetFileContentString returned error: %v", err)
+// 	str, _err := doc.GetFileContentString()
+// 	if _err != nil {
+// 		t.Errorf("GetFileContentString returned error: %v", _err)
 // 	}
 // 	if str != string(content) {
 // 		t.Errorf("Expected %v, got %v", string(content), str)
@@ -57,15 +57,15 @@ func TestNewCalibrationHandler(t *testing.T) {
 func TestReadFile(t *testing.T) {
 	const testFileName = "testfile.txt"
 	testContent := []byte("test content")
-	err := os.WriteFile(testFileName, testContent, 0644)
-	if err != nil {
-		t.Fatalf("Failed to create test file: %v", err)
+	_err := os.WriteFile(testFileName, testContent, 0644)
+	if _err != nil {
+		t.Fatalf("Failed to create test file: %v", _err)
 	}
 	defer os.Remove(testFileName)
 
-	content, err := ReadFile(testFileName)
-	if err != nil {
-		t.Errorf("ReadFile returned error: %v", err)
+	content, _err := ReadFile(testFileName)
+	if _err != nil {
+		t.Errorf("ReadFile returned error: %v", _err)
 	}
 	if string(content) != string(testContent) {
 		t.Errorf("Expected %v, got %v", string(testContent), string(content))
@@ -74,9 +74,9 @@ func TestReadFile(t *testing.T) {
 
 // func TestSplitToLines(t *testing.T) {
 // 	data := "line1\nline2\nline3\n"
-// 	lines, err := SplitToLines(data)
-// 	if err != nil {
-// 		t.Errorf("SplitToLines returned error: %v", err)
+// 	lines, _err := SplitToLines(data)
+// 	if _err != nil {
+// 		t.Errorf("SplitToLines returned error: %v", _err)
 // 	}
 // 	expected := []string{"line1", "line2", "line3"}
 // 	if len(lines) != len(expected) {

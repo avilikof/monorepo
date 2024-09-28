@@ -24,44 +24,44 @@ func NewKafkaClient(bootstrapAddr string) (*KafkaClient, error) {
 
 func (kc *KafkaClient) GetMessage(messageChannel chan []byte, wg *sync.WaitGroup) error {
 	defer wg.Done()
-	var err error
-	err = kc.config.SetKey("group.id", kafka.ConfigValue("myGroup"))
-	if err != nil {
-		return err
+	var _err error
+	_err = kc.config.SetKey("group.id", kafka.ConfigValue("myGroup"))
+	if _err != nil {
+		return _err
 	}
-	err = kc.config.SetKey("go.application.rebalance.enable", kafka.ConfigValue(true))
-	if err != nil {
-		return err
+	_err = kc.config.SetKey("go.application.rebalance.enable", kafka.ConfigValue(true))
+	if _err != nil {
+		return _err
 	}
-	err = kc.config.SetKey("enable.auto.commit", kafka.ConfigValue(false))
-	if err != nil {
-		return err
-	}
-
-	cons, err := kc.getConsumer()
-	if err != nil {
-		panic(err)
+	_err = kc.config.SetKey("enable.auto.commit", kafka.ConfigValue(false))
+	if _err != nil {
+		return _err
 	}
 
-	err = cons.SubscribeTopics([]string{"test"}, nil)
+	cons, _err := kc.getConsumer()
+	if _err != nil {
+		panic(_err)
+	}
+
+	_err = cons.SubscribeTopics([]string{"test"}, nil)
 
 	defer cons.Close()
 	defer close(messageChannel)
 
-	if err != nil {
-		panic(err)
+	if _err != nil {
+		panic(_err)
 	}
 
 	for {
-		msg, err := cons.ReadMessage(time.Second)
-		if err != nil {
-			if err.(kafka.Error).IsTimeout() {
+		msg, _err := cons.ReadMessage(time.Second)
+		if _err != nil {
+			if _err.(kafka.Error).IsTimeout() {
 				fmt.Println("Reached end for messages...")
 				break
 			}
-			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
-			fmt.Printf("Error code: %s\n", err.(kafka.Error).IsTimeout())
-			return err
+			fmt.Printf("Consumer error: %v (%v)\n", _err, msg)
+			fmt.Printf("Error code: %s\n", _err.(kafka.Error).IsTimeout())
+			return _err
 		}
 		messageChannel <- msg.Value
 	}
