@@ -12,9 +12,9 @@ pub enum EnvLoaderError {
 
 /// Module for environment loading functionality.
 pub mod load {
-    use dotenv::from_filename;
-
     use crate::{file_exists, EnvLoaderError};
+    use dotenv::from_filename;
+    use log::error;
 
     /// Loads environment variables from a specified .env file.
     ///
@@ -31,7 +31,10 @@ pub mod load {
                 from_filename(path).ok();
                 Ok(())
             }
-            Err(err) => Err(err),
+            Err(err) => {
+                error!("{path}");
+                Err(err)
+            }
         }
     }
 }

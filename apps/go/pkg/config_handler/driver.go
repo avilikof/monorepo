@@ -42,8 +42,8 @@ func (e *EnvironmentVarHandler) LoadYaml(path string) error {
 	viper.SetConfigType("yaml")
 
 	// Read the configuration file
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+	if _err := viper.ReadInConfig(); _err != nil {
+		log.Fatalf("Error reading config file, %s", _err)
 	}
 	return nil
 }

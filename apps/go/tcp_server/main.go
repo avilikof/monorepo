@@ -17,16 +17,16 @@ func NewTcpServer() *NetworkServer {
 }
 
 func (ns *NetworkServer) ListenTcp(address string) error {
-	listener, err := net.Listen("tcp", address)
-	if err != nil {
-		return err
+	listener, _err := net.Listen("tcp", address)
+	if _err != nil {
+		return _err
 	}
 
 	ns.listener = listener
 	log.Info().Msgf("listening TCP on port: ", ns.listener.Addr())
 
-	// connectionIndex, err := ns.AcceptConnection()
-	// if err != nil {
+	// connectionIndex, _err := ns.AcceptConnection()
+	// if _err != nil {
 	// 	return 0, er
 	// }
 
@@ -34,9 +34,9 @@ func (ns *NetworkServer) ListenTcp(address string) error {
 }
 
 func (ns *NetworkServer) AcceptConnection() (int, error) {
-	c, err := ns.listener.Accept()
-	if err != nil {
-		return 0, err
+	c, _err := ns.listener.Accept()
+	if _err != nil {
+		return 0, _err
 	}
 	index := len(ns.connection)
 	ns.connection = append(ns.connection, c)
@@ -46,9 +46,9 @@ func (ns *NetworkServer) AcceptConnection() (int, error) {
 
 func (ns *NetworkServer) Read(index int) ([]byte, error) {
 	buff := make([]byte, 1024)
-	_, err := ns.connection[index].Read(buff)
-	if err != nil {
-		return nil, err
+	_, _err := ns.connection[index].Read(buff)
+	if _err != nil {
+		return nil, _err
 	}
 	log.Info().Msg(fmt.Sprintf("recieved message form:", ns.connection[index].RemoteAddr()))
 	return ns.removePadding(&buff), nil
@@ -73,19 +73,19 @@ func main() {
 
 	netServer := NewTcpServer()
 	netServer.ListenTcp("127.0.0.1:8080")
-	index, err := netServer.AcceptConnection()
-	if err != nil {
-		log.Err(err)
+	index, _err := netServer.AcceptConnection()
+	if _err != nil {
+		log.Err(_err)
 	}
 	defer netServer.Close(index)
 
-	data, err := netServer.Read(index)
-	if err != nil {
-		if err.Error() == "EOF" {
+	data, _err := netServer.Read(index)
+	if _err != nil {
+		if _err.Error() == "EOF" {
 			log.Error().Msg("connection closed by remote host")
 			return
 		}
-		panic(err.Error())
+		panic(_err.Error())
 	}
 	log.Info().Msg(string(data))
 	fmt.Println(string(data))

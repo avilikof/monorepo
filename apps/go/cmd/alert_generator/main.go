@@ -10,26 +10,26 @@ import (
 )
 
 func main() {
-	config, err := config_handler.NewEnvVarHandler()
-	if err != nil {
-		log.Fatalln(err)
+	config, _err := config_handler.NewEnvVarHandler()
+	if _err != nil {
+		log.Fatalln(_err)
 	}
 	config.LoadYaml("/Users/alex/git/monorepo/apps/go/configs/config.yaml")
 
-	natsAddr, err := config.Get("nats.addr")
-	if err != nil {
-		log.Fatal(err)
+	natsAddr, _err := config.Get("nats.addr")
+	if _err != nil {
+		log.Fatal(_err)
 	}
-	natsConn, err := natsdriver.NewNatsConnection(&natsAddr)
-	if err != nil {
-		panic(err)
+	natsConn, _err := natsdriver.NewNatsConnection(&natsAddr)
+	if _err != nil {
+		panic(_err)
 	}
 	defer natsConn.Close()
 	pubSub := natsdriver.NewPubSub(natsConn)
 	for range 100 {
-		err := alertgenerator.PublishAlert("test", pubSub)
-		if err != nil {
-			panic(err)
+		_err := alertgenerator.PublishAlert("test", pubSub)
+		if _err != nil {
+			panic(_err)
 		}
 		time.Sleep(time.Second)
 

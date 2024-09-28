@@ -22,9 +22,9 @@ func main() {
 		fmt.Println(_err)
 	}
 
-	natsClient, err := nats.Connect("192.168.32.163:4222")
-	if err != nil {
-		fmt.Printf("Err 1:%v\n", err)
+	natsClient, _err := nats.Connect("192.168.32.163:4222")
+	if _err != nil {
+		fmt.Printf("Err 1:%v\n", _err)
 	}
 
 	var wg sync.WaitGroup
@@ -36,8 +36,8 @@ func main() {
 		defer wg.Done()
 		startTime := time.Now()
 		for {
-			// largestNumberStr, err := configurator.Get("LARGEST_NUMBER")
-			// largestNumber, err := strconv.ParseInt(largestNumberStr, 10, 64)
+			// largestNumberStr, _err := configurator.Get("LARGEST_NUMBER")
+			// largestNumber, _err := strconv.ParseInt(largestNumberStr, 10, 64)
 			alert := alert_entity.RandomAlert(100000)
 			n += 1
 			if n%1000 == 0 {
@@ -69,9 +69,9 @@ func produceRandomAlert(kafkaHandler *kafka_driver.KafkaHandler, randomAlert *al
 
 func produceRandomAlertToNats(natsClient *nats.Conn, alert *alert_entity.AlertEntity) {
 	alertBytes, _ := alert.ToByte()
-	err := natsClient.Publish("alerts", alertBytes)
-	if err != nil {
-		fmt.Printf("Err 2 %v :\n", err)
+	_err := natsClient.Publish("alerts", alertBytes)
+	if _err != nil {
+		fmt.Printf("Err 2 %v :\n", _err)
 	}
 
 }

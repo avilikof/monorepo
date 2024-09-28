@@ -25,21 +25,24 @@ func (kh *KafkaHandler) Subscribe(topic string) error {
 		return nil
 	}
 
-	groupId, offset, err := getConsumerEnvVars()
-	if err != nil {
-		return err
+	groupId, offset, _err := getConsumerEnvVars()
+	if _err != nil {
+		return _err
 	}
 
-	cons, err := createKafkaConsumer(groupId, offset, kh.cfgMap)
-	if err != nil {
-		return err
+	cons, _err := createKafkaConsumer(groupId, offset, kh.cfgMap)
+	if _err != nil {
+		return _err
 	}
-	err = cons.Subscribe(topic, nil)
+	_err = cons.Subscribe(topic, nil)
 	kh.cfgMap.SetKey("go.application.rebalance.enable", false)
-	if err != nil {
-		return err
+	if _err != nil {
+		return _err
 	}
 	return kh.setConsumer(cons)
+}
+func (kh *KafkaHandler) SetConfigValues(key string, value kafka.ConfigValue) error {
+	return kh.cfgMap.SetKey(key, value)
 }
 func (kh *KafkaHandler) SubscriptionIsActive() bool {
 	if kh.consumer != nil {
@@ -66,9 +69,9 @@ func (kh *KafkaHandler) setProducer(producer *kafka.Producer) error {
 	return nil
 }
 func (kh *KafkaHandler) Get() (kafka.Message, error) {
-	message, _err := kh.consumer.ReadMessage(120 * time.Second)
-	if _err != nil {
-		return kafka.Message{}, _err
+	message, err := kh.consumer.ReadMessage(10 * time.Second)
+	if err != nil {
+		return kafka.Message{}, err
 	}
 	return *message, nil
 }
@@ -78,13 +81,13 @@ func (kh *KafkaHandler) Push(key, value []byte, topic string) error {
 	}
 	if kh.producer == nil || !kh.ProducerIsAlive() {
 
-		producer, err := createKafkaProducer(kh.cfgMap)
-		if err != nil {
-			return err
+		producer, _err := createKafkaProducer(kh.cfgMap)
+		if _err != nil {
+			return _err
 		}
-		err = kh.setProducer(producer)
-		if err != nil {
-			return err
+		_err = kh.setProducer(producer)
+		if _err != nil {
+			return _err
 		}
 	}
 	kafkaMessage := createMessage(key, value, topic)

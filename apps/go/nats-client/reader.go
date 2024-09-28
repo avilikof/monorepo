@@ -17,9 +17,9 @@ func (nc *NatsReaderClient) connect_to_server() (nats_driver.Client, error) {
 	return *nats_driver.DefaultClient(&nc.natsServerAddr), nil
 }
 func (nc *NatsReaderClient) Pull(subject string) (string, error) {
-	client, err := nc.connect_to_server()
-	if err != nil {
-		panic(err)
+	client, _err := nc.connect_to_server()
+	if _err != nil {
+		panic(_err)
 	}
 	return client.Pull(subject), nil
 }

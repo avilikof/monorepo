@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use log::{debug, error, info};
-use rdkafka::config::ClientConfig;
+use rdkafka::config::{ClientConfig, RDKafkaLogLevel};
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::error::{KafkaError, KafkaResult};
 use rdkafka::message::{BorrowedMessage, Message};
@@ -30,6 +30,14 @@ impl KafkaClientConfig {
             user,
             pass,
             group_id,
+        }
+    }
+    pub fn default(bootstrap_server: String) -> Self {
+        Self {
+            bootstrap_server,
+            user: String::default(),
+            pass: String::default(),
+            group_id: String::from("defaultGroup"),
         }
     }
 }
@@ -136,7 +144,6 @@ impl KafkaProducerClient {
             // Additional producer-specific configurations can be set here
             .create()
             .expect("Producer creation error");
-
         Self { producer }
     }
 
@@ -171,11 +178,12 @@ pub fn create_kafka_consumer(cfg: &KafkaClientConfig) -> KafkaResult<StreamConsu
         .set("client.id", "consumer_one")
         .set("bootstrap.servers", &cfg.bootstrap_server)
         .set("auto.offset.reset", "latest")
-        .set("security.protocol", "SASL_SSL")
-        .set("sasl.mechanisms", "SCRAM-SHA-256")
-        .set("sasl.username", &cfg.user)
-        .set("sasl.password", &cfg.pass)
-        .set("ssl.ca.location", "/etc/ssl/certs")
+        .set_log_level(RDKafkaLogLevel::Debug)
+        // .set("security.protocol", "SASL_SSL")
+        // .set("sasl.mechanisms", "SCRAM-SHA-256")
+        // .set("sasl.username", &cfg.user)
+        // .set("sasl.password", &cfg.pass)
+        // .set("ssl.ca.location", "/etc/ssl/certs")
         .create()?;
     Ok(consumer)
 }

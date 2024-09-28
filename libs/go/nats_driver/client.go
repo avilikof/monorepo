@@ -19,9 +19,9 @@ func DefaultClient(url *string) *Client {
 		Timeout:        100 * time.Second,
 		Verbose:        true,
 	}
-	client, err := opts.Connect()
-	if err != nil {
-		panic(err)
+	client, _err := opts.Connect()
+	if _err != nil {
+		panic(_err)
 	}
 	return &Client{
 		client: client,
@@ -54,17 +54,17 @@ func (c *Client) Pull(subj string) string {
 	fmt.Println("Reading")
 	defer fmt.Println("I'm done reading")
 	// Subscribe to the subject "updates"
-	// subscription, err := c.client.Subscribe(subj, func(msg *nats.Msg) {
+	// subscription, _err := c.client.Subscribe(subj, func(msg *nats.Msg) {
 	// 	fmt.Printf("Received message: %s\n", string(msg.Data))
 	// })
-	s, err := c.client.SubscribeSync(subj)
-	if err != nil {
-		panic(err)
+	s, _err := c.client.SubscribeSync(subj)
+	if _err != nil {
+		panic(_err)
 	}
-	m, err := s.NextMsg(2 * time.Second)
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
+	m, _err := s.NextMsg(2 * time.Second)
+	if _err != nil {
+		log.Fatal(_err)
+		panic(_err)
 	}
 	return string(m.Data)
 }
